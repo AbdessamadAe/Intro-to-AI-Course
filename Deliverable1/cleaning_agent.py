@@ -1,6 +1,6 @@
 import random
 from typing import List, Tuple
-
+import sys
 
 class Environment:
     
@@ -16,8 +16,6 @@ class Environment:
     
     def get_room_state(self, room_index: int) -> Tuple[bool, int]:
         """
-        Get the state of a room.
-        
         Returns:
             Tuple of (is_dirty, dirtiness_level)
         """
@@ -50,12 +48,11 @@ class Environment:
 
 class Agent:
     
-    # Action costs
     MOVE_COST = 2
     
     def __init__(self, num_rooms: int):
 
-        self.position = 0  # Start at room 0
+        self.position = 0
         self.initial_energy = 2.5 * num_rooms
         self.energy = self.initial_energy
         self.num_rooms = num_rooms
@@ -188,9 +185,24 @@ def print_results(results: dict):
 
 if __name__ == "__main__":
     
-    N = 10
-    T = 100
+    if len(sys.argv) != 3:
+        print("Usage: python cleaning_agent.py <N> <T>")
+        print("  N: Number of rooms")
+        print("  T: Maximum timesteps")
+        sys.exit(1)
     
+    try:
+        N = int(sys.argv[1])
+        T = int(sys.argv[2])
+        
+        if N <= 0 or T <= 0:
+            print("Error: N and T must be positive integers")
+            sys.exit(1)
+            
+    except ValueError:
+        print("Error: N and T must be valid integers")
+        sys.exit(1)
+
     results = run_simulation(
         num_rooms=N,
         max_timesteps=T,
