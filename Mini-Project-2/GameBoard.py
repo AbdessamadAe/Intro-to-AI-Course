@@ -32,11 +32,21 @@ class GameBoard:
                     self.board[row][col] = WHITE
 
     def display_board(self):
-        """Display the current state of the board."""
+        """Display the current state of the board with coordinates."""
+        print("   ", end="")
+        for col in range(BOARD_SIZE):
+            print(f" {col}", end="")
+        print()
+        
+        print("  +" + "-" * (BOARD_SIZE * 2) + "+")
+        
         for row in range(BOARD_SIZE):
+            print(f"{row} |", end="")
             for col in range(BOARD_SIZE):
-                print(f"{self.board[row][col]}", end="")
-            print()
+                print(f" {self.board[row][col]}", end="")
+            print(" |")
+        
+        print("  +" + "-" * (BOARD_SIZE * 2) + "+")
         print()
 
     def is_valid_move(self, start_row, start_col, target_row, target_col, player):
