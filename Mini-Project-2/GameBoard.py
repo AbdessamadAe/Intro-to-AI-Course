@@ -102,18 +102,81 @@ class GameBoard:
         for row in range(BOARD_SIZE):
             for col in range(BOARD_SIZE):
                 if self.board[row][col] in [player, player.lower()]:  # the player's piece
-                    for jump_row, jump_col in JUMP_DIRECTIONS:
-                        new_row = row + jump_row
-                        new_col = col + jump_col
+                    if self.has_jump_from_position(row, col, player):
+                        return True
+        return False
 
-                        if 0 <= new_row < BOARD_SIZE and 0 <= new_col < BOARD_SIZE and self.board[new_row][new_col] == EMPTY:
-                            # Check for enemy in the middle
-                            middle_row = (row + new_row) // 2
-                            middle_col = (col + new_col) // 2
-                            enemy_there = self.board[middle_row][middle_col]
+    def has_jump_from_position(self, row, col, player):
+        """Check if a specific piece at (row, col) has any available jump moves.
+        
+        Note: Regular pieces cannot jump backwards, only kings can jump in all directions.
+        """
+        piece = self.board[row][col]
+        if piece not in [player, player.lower()]:
+            return False
+        
+        is_king = (piece.islower())  # Kings are lowercase
+        
+        for jump_row, jump_col in JUMP_DIRECTIONS:
+            # Skip backward jumps for regular pieces
+            if not is_king:
+                if player == WHITE and jump_row > 0:  # WHITE can't jump down (backwards)
+                    continue
+                if player == BLACK and jump_row < 0:  # BLACK can't jump up (backwards)
+                    continue
+            
+            new_row = row + jump_row
+            new_col = col + jump_col
+            
+            # Check if target is valid and empty
+            if 0 <= new_row < BOARD_SIZE and 0 <= new_col < BOARD_SIZE and self.board[new_row][new_col] == EMPTY:
+                # Check for enemy in the middle
+                middle_row = (row + new_row) // 2
+                middle_col = (col + new_col) // 2
+                enemy_there = self.board[middle_row][middle_col]
+                
+                if enemy_there != EMPTY and enemy_there.upper() != player.upper():
+                    return True
+        return False
+
+    def has_any_legal_move(self, player):
+        """Check if the player has any legal moves available.
+        
+        Respects mandatory jump rule: if any jumps exist, only jumps are legal moves.
+        """
+        # First check if any jumps are available
+        jumps_available = self.has_jump(player)
+        
+        for row in range(BOARD_SIZE):
+            for col in range(BOARD_SIZE):
+                piece = self.board[row][col]
+                if piece not in [player, player.lower()]:
+                    continue
+                
+                # If jumps are mandatory, only check for jumps
+                if jumps_available:
+                    if self.has_jump_from_position(row, col, player):
+                        return True
+                else:
+                    # Check for simple moves (1 square diagonally)
+                    is_king = piece.islower()
+                    
+                    # Try all 4 diagonal directions
+                    for row_offset in [-1, 1]:
+                        for col_offset in [-1, 1]:
+                            # Skip backward moves for regular pieces
+                            if not is_king:
+                                if player == WHITE and row_offset > 0:  # WHITE can't move down
+                                    continue
+                                if player == BLACK and row_offset < 0:  # BLACK can't move up
+                                    continue
                             
-                            if enemy_there != EMPTY and enemy_there.upper() != player.upper():
+                            target_row = row + row_offset
+                            target_col = col + col_offset
+                            
+                            if self.is_valid_move(row, col, target_row, target_col, player):
                                 return True
+        
         return False
                             
 
