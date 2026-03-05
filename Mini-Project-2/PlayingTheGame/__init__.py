@@ -3,18 +3,47 @@ PlayingTheGame Package - Game Controller for Checkers
 """
 
 from GameBoard import GameBoard
-from OtherStuff import WHITE, BLACK
+from OtherStuff import WHITE, BLACK, AnalyticsManager
 from SearchToolBox import MinimaxSearch, AlphaBetaSearch, AlphaBetaWithOrdering
 
 class Checkers:
     """
-    2 humans playing against each other, the bot will be added later
+    Game controller for checkers - supports 2 humans or human vs AI
     """
 
     def __init__(self):
         self.game_board = GameBoard()
         self.move_number = 0
         self.current_player = WHITE
+        self.Analytics = AnalyticsManager()
+    
+    def StartingMoveLocation(self, X, Y):
+        """Converts 1-indexed Line/Column to 0-indexed internal coordinates.
+        
+        Required by assignment naming convention.
+        
+        Args:
+            X: Line number (1-8, user-facing)
+            Y: Column number (1-8, user-facing)
+        
+        Returns:
+            tuple: (Row, Col) in 0-indexed format
+        """
+        return X - 1, Y - 1
+    
+    def TargetingMoveLocation(self, X, Y):
+        """Converts 1-indexed Line/Column to 0-indexed internal coordinates.
+        
+        Required by assignment naming convention.
+        
+        Args:
+            X: Line number (1-8, user-facing)
+            Y: Column number (1-8, user-facing)
+        
+        Returns:
+            tuple: (Row, Col) in 0-indexed format
+        """
+        return X - 1, Y - 1
     
     def switch_player(self):
         if self.current_player == WHITE:
@@ -205,8 +234,19 @@ class Checkers:
             if result['was_jump']:
                 print("AI captured an opponent piece!")
         
-        # Display analytics
-        search_algorithm.Analytics.PrintAnalytics()
+        # Record analytics
+        ai_metrics = {
+            "NumberNodesExpanded": search_algorithm.Analytics.NumberNodesExpanded,
+            "NumberPrunes": search_algorithm.Analytics.NumberNodesPruned,
+            "NumberOrderedPrunes": search_algorithm.Analytics.NumberNodesPruned if 'Ordering' in search_algorithm.Analytics.SearchStrategy else 0,
+            "EffectiveDepthReached": search_algorithm.Analytics.MaxDepthReached,
+            "LastSearchMillis": int(search_algorithm.Analytics.GetTimeElapsed() * 1000),
+            "Strategy": search_algorithm.Analytics.SearchStrategy,
+            "TimeLimitSeconds": search_algorithm.TimeLimit,
+            "MaxPlies": search_algorithm.MaxDepth,
+        }
+        self.Analytics.RecordMoveAnalytics("black", ai_metrics, best_move.Describe())
+        self.Analytics.PrintLastMoveAnalytics()
         
         self.move_number += 1
         print(f"\nAI turn complete! Total moves: {self.move_number}")
