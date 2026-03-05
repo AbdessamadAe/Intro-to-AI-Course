@@ -8,8 +8,8 @@ class Checkers:
 
     def __init__(self):
         self.game_board = GameBoard()
-        self.move_number = 0  # to track how many moves happened
-        self.current_player = WHITE  # the white player is the first one to start
+        self.move_number = 0
+        self.current_player = WHITE
     
     def switch_player(self):
         if self.current_player == WHITE:
@@ -17,7 +17,7 @@ class Checkers:
         else:
             self.current_player = WHITE
 
-    def get_move_location(self):  # get the move from any player
+    def get_move_location(self):
         """Get starting and target locations for a move from user input."""
         while True:
             try:
@@ -56,7 +56,6 @@ class Checkers:
                 elif cell.upper() == BLACK:
                     black_count += 1
         
-        # Check if all pieces of one color are captured
         if white_count == 0:
             print(f"\n🏆 BLACK WINS! All white pieces captured.")
             print(f"Game ended after {self.move_number} moves.")
@@ -66,7 +65,6 @@ class Checkers:
             print(f"Game ended after {self.move_number} moves.")
             return True
         
-        # Check if current player has no legal moves (stalemate)
         if not self.game_board.has_any_legal_move(self.current_player):
             winner = BLACK if self.current_player == WHITE else WHITE
             print(f"\n🏆 {winner} WINS! {self.current_player} has no legal moves (stalemate).")
@@ -88,12 +86,10 @@ class Checkers:
 
         self.game_board.display_board()
 
-        # Check if jumps are available (mandatory jump rule)
         jumps_available = self.game_board.has_jump(self.current_player)
         if jumps_available:
             print(f"⚠ JUMP AVAILABLE! You must jump.")
 
-        # Keep asking for moves until a valid one is made
         move_successful = False
         landing_row = None
         landing_col = None
@@ -101,7 +97,6 @@ class Checkers:
         while not move_successful:
             start_row, start_col, target_row, target_col = self.get_move_location()
 
-            # Check if attempting a simple move when jumps are mandatory
             if jumps_available:
                 move_distance = abs(target_row - start_row)
                 if move_distance == 1:
@@ -116,31 +111,25 @@ class Checkers:
             else:
                 print("Invalid move. Try again.")
         
-        # Handle multi-jump sequences
         if result['was_jump']:
-            # If promoted to king, turn ends (standard checkers rule)
             if result['promoted']:
                 print("Promoted to KING! Turn ends.")
                 self.move_number += 1
                 return
             
-            # Check for additional jumps from landing position
             while self.game_board.has_jump_from_position(landing_row, landing_col, self.current_player):
                 print("\n" + "="*50)
                 print(f"⚠ ADDITIONAL JUMP AVAILABLE! You must continue jumping.")
                 self.game_board.display_board()
                 
-                # Get next jump (must start from landing position)
                 jump_made = False
                 while not jump_made:
                     start_row, start_col, target_row, target_col = self.get_move_location()
                     
-                    # Validate that move starts from the landing position
                     if start_row != landing_row or start_col != landing_col:
                         print(f"Invalid: You must continue jumping with the piece at ({landing_row}, {landing_col})!")
                         continue
                     
-                    # Validate that it's a jump (distance = 2)
                     if abs(target_row - start_row) != 2:
                         print("Invalid: You must make a jump (distance of 2)!")
                         continue
@@ -153,7 +142,6 @@ class Checkers:
                     else:
                         print("Invalid move. Try again.")
                 
-                # If promoted during multi-jump, turn ends
                 if result['promoted']:
                     print("Promoted to KING! Turn ends.")
                     break

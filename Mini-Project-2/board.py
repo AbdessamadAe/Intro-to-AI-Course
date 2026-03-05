@@ -4,11 +4,11 @@ from constants import (BOARD_SIZE, WHITE, BLACK, WHITE_KING, BLACK_KING, EMPTY,
 
 class GameBoard:
     def __init__(self):
-        self.board = []  # creating the board
+        self.board = []
         for row_number in range(BOARD_SIZE):
             one_row = []
             for col_number in range(BOARD_SIZE):
-                one_row.append(EMPTY)  # creating a row that will be then integrated into the board
+                one_row.append(EMPTY)
             
             self.board.append(one_row)
 
@@ -51,47 +51,40 @@ class GameBoard:
 
     def is_valid_move(self, start_row, start_col, target_row, target_col, player):
         """Check if a move from start to target position is valid."""
-        # Checking the boundaries
         if not (0 <= start_row < BOARD_SIZE and 0 <= start_col < BOARD_SIZE and 
                 0 <= target_row < BOARD_SIZE and 0 <= target_col < BOARD_SIZE):
             return False
         
-        # Selecting the own piece
         piece = self.board[start_row][start_col]
-        if piece not in [player, player.lower()]:  # 'W','w' or 'B','b'
+        if piece not in [player, player.lower()]:
             return False
 
         row_diff = target_row - start_row
         col_diff = target_col - start_col
 
-        # WHITE should move up (to smaller row numbers) unless it is a king
         if player == WHITE:
-            if row_diff > 0 and piece == WHITE:  # WHITE can't move down (not king)
+            if row_diff > 0 and piece == WHITE:
                 return False
-            
-        else:  # BLACK should move down (to bigger row numbers) unless it is a king
-            if row_diff < 0 and piece == BLACK:  # BLACK can't move up (not king)
-                return False            
+        else:
+            if row_diff < 0 and piece == BLACK:
+                return False
 
-        # Diagonal move, even king moves the same number
         if abs(row_diff) not in (SIMPLE_MOVE, JUMP_MOVE) or abs(col_diff) not in (SIMPLE_MOVE, JUMP_MOVE) or abs(row_diff) != abs(col_diff):
             return False
         
-        # Simple move
         if abs(row_diff) == SIMPLE_MOVE:
-            if self.board[target_row][target_col] != EMPTY:  # target must be empty
+            if self.board[target_row][target_col] != EMPTY:
                 return False
             return True
         
-        # When we have a jump
         if abs(row_diff) == JUMP_MOVE:
-            if self.board[target_row][target_col] != EMPTY:  # target empty for landing
+            if self.board[target_row][target_col] != EMPTY:
                 return False
-            # Enemy in the middle
+            
             mid_row = (start_row + target_row) // 2
             mid_col = (start_col + target_col) // 2
             mid_piece = self.board[mid_row][mid_col]
-            if mid_piece == EMPTY or mid_piece.upper() == player.upper():  # must be opponent
+            if mid_piece == EMPTY or mid_piece.upper() == player.upper():
                 return False
             return True
         
@@ -108,9 +101,9 @@ class GameBoard:
         BLACK pieces move down (positive row offset), so negative offset is backwards.
         """
         if player == WHITE:
-            return row_offset > 0  # Moving down is backwards for WHITE
-        else:  # player == BLACK
-            return row_offset < 0  # Moving up is backwards for BLACK
+            return row_offset > 0
+        else:
+            return row_offset < 0
     
     def _can_jump_in_direction(self, row, col, row_offset, col_offset, player):
         """Check if a piece can jump in a specific direction.
@@ -122,23 +115,19 @@ class GameBoard:
         """
         piece = self.board[row][col]
         
-        # Regular pieces can't jump backwards
         if not self._is_king(piece) and self._is_backward_direction(player, row_offset):
             return False
         
-        # Calculate target and middle positions
         target_row = row + row_offset
         target_col = col + col_offset
         middle_row = (row + target_row) // 2
         middle_col = (col + target_col) // 2
         
-        # Check boundaries and if target is empty
         if not (0 <= target_row < BOARD_SIZE and 0 <= target_col < BOARD_SIZE):
             return False
         if self.board[target_row][target_col] != EMPTY:
             return False
         
-        # Check if middle square has enemy piece
         middle_piece = self.board[middle_row][middle_col]
         if middle_piece == EMPTY or middle_piece.upper() == player.upper():
             return False
@@ -154,7 +143,6 @@ class GameBoard:
         if piece not in [player, player.lower()]:
             return False
         
-        # Check all four diagonal jump directions
         for row_offset, col_offset in JUMP_DIRECTIONS:
             if self._can_jump_in_direction(row, col, row_offset, col_offset, player):
                 return True
@@ -179,7 +167,6 @@ class GameBoard:
         Respects mandatory jump rule: if any jumps exist, only jumps are legal moves.
         Returns True if at least one legal move exists, False otherwise (stalemate).
         """
-        # Check if any jumps are available (mandatory jump rule)
         jumps_available = self.has_jump(player)
         
         for row in range(BOARD_SIZE):
@@ -188,15 +175,12 @@ class GameBoard:
                 if piece not in [player, player.lower()]:
                     continue
                 
-                # If jumps are mandatory, only check for jumps
                 if jumps_available:
                     if self.has_jump_from_position(row, col, player):
                         return True
                 else:
-                    # Check for simple moves (1 square diagonally in all 4 directions)
                     for row_offset in [-1, 1]:
                         for col_offset in [-1, 1]:
-                            # Skip backward moves for regular pieces
                             if not self._is_king(piece) and self._is_backward_direction(player, row_offset):
                                 continue
                             
@@ -227,13 +211,11 @@ class GameBoard:
         self.board[start_row][start_col] = EMPTY
         self.board[target_row][target_col] = piece
 
-        # Handle jump (capture opponent piece)
         if was_jump:
             mid_row = (start_row + target_row) // 2
             mid_col = (start_col + target_col) // 2
             self.board[mid_row][mid_col] = EMPTY
 
-        # King promotion if it reaches the other end
         promoted = False
         if piece == WHITE and target_row == 0:
             self.board[target_row][target_col] = WHITE_KING
