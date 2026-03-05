@@ -38,7 +38,15 @@ class Checkers:
         return start_row, start_col, target_row, target_col
        
     def is_game_over(self):
-        """Check if the game is over (one player has no pieces left)."""
+        """Check if the game is over.
+        
+        Game ends when:
+        1. One player has no pieces left (captured all)
+        2. Current player has no legal moves (stalemate)
+        
+        Returns:
+            bool - True if game is over, False otherwise
+        """
         white_count = 0
         black_count = 0
         for row in self.game_board.board:
@@ -48,12 +56,23 @@ class Checkers:
                 elif cell.upper() == BLACK:
                     black_count += 1
         
+        # Check if all pieces of one color are captured
         if white_count == 0:
-            print(f"Black wins after {self.move_number} moves")
+            print(f"\n🏆 BLACK WINS! All white pieces captured.")
+            print(f"Game ended after {self.move_number} moves.")
             return True
         if black_count == 0:
-            print(f"White wins after {self.move_number} moves")
+            print(f"\n🏆 WHITE WINS! All black pieces captured.")
+            print(f"Game ended after {self.move_number} moves.")
             return True
+        
+        # Check if current player has no legal moves (stalemate)
+        if not self.game_board.has_any_legal_move(self.current_player):
+            winner = BLACK if self.current_player == WHITE else WHITE
+            print(f"\n🏆 {winner} WINS! {self.current_player} has no legal moves (stalemate).")
+            print(f"Game ended after {self.move_number} moves.")
+            return True
+        
         return False
 
         
@@ -145,12 +164,14 @@ class Checkers:
     def play_game_two_players(self):
         """Main game loop for two human players."""
         while True:
-            self.play_human_turn()
+            # Check for game over BEFORE player's turn (better UX)
             if self.is_game_over():
                 break
+            
+            self.play_human_turn()
             self.switch_player()
     
-        print("GAME OVER!")
+        print("\nGAME OVER!")
         self.game_board.display_board()
 
 if __name__ == "__main__":
