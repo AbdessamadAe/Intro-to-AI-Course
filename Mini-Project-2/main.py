@@ -1,6 +1,6 @@
 from GameBoard import GameBoard
 
-class PlayingTheGame:
+class Checkers:
     """
     2 humans playing agaust each other, the bot will be added later
     """
@@ -93,9 +93,8 @@ class PlayingTheGame:
         self.gameBoard.DisplayBoard()
 
 if __name__ == "__main__":
-    game = PlayingTheGame()
+    game = Checkers()
     game.PlayGameTwoPlayers()   
-
 
 
     
