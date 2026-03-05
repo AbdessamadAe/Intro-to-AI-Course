@@ -11,7 +11,7 @@ This package contains:
 import copy
 import time
 from OtherStuff import (WHITE, BLACK, WHITE_KING, BLACK_KING, EMPTY, BOARD_SIZE,
-                       MoveRepresentation, AnalyticsTracker)
+                       GameMove, AnalyticsTracker)
 
 
 def EvaluateBoardState(game_board, player):
@@ -100,7 +100,7 @@ def GetAllLegalMoves(game_board, player):
         player: Player to get moves for
     
     Returns:
-        list: List of MoveRepresentation objects
+        list: List of GameMove objects
     """
     moves = []
     
@@ -124,7 +124,7 @@ def GetAllLegalMoves(game_board, player):
                         target_col = start_col + col_offset
                         
                         if game_board.is_valid_move(start_row, start_col, target_row, target_col, player):
-                            move = MoveRepresentation(
+                            move = GameMove(
                                 (start_row, start_col),
                                 (target_row, target_col)
                             )
@@ -137,7 +137,7 @@ def GetAllLegalMoves(game_board, player):
                         target_col = start_col + col_offset
                         
                         if game_board.is_valid_move(start_row, start_col, target_row, target_col, player):
-                            move = MoveRepresentation(
+                            move = GameMove(
                                 (start_row, start_col),
                                 (target_row, target_col)
                             )
@@ -150,7 +150,7 @@ def GetAllLegalMoves(game_board, player):
                         target_col = start_col + col_offset
                         
                         if game_board.is_valid_move(start_row, start_col, target_row, target_col, player):
-                            move = MoveRepresentation(
+                            move = GameMove(
                                 (start_row, start_col),
                                 (target_row, target_col)
                             )
@@ -164,7 +164,7 @@ def ApplyMove(game_board, move):
     
     Args:
         game_board: GameBoard instance
-        move: MoveRepresentation object
+        move: GameMove object
     
     Returns:
         GameBoard: New board state after move
@@ -234,7 +234,7 @@ class MinimaxSearch:
             player: Player to find move for (AI player)
         
         Returns:
-            MoveRepresentation: Best move found, or None if no moves available
+            GameMove: Best move found, or None if no moves available
         """
         self.Analytics.Reset()
         self.Analytics.StartTimer()
@@ -338,7 +338,7 @@ class AlphaBetaSearch:
             player: Player to find move for (AI player)
         
         Returns:
-            MoveRepresentation: Best move found, or None if no moves available
+            GameMove: Best move found, or None if no moves available
         """
         self.Analytics.Reset()
         self.Analytics.StartTimer()
@@ -458,7 +458,7 @@ class AlphaBetaWithOrdering:
             player: Player to find move for (AI player)
         
         Returns:
-            MoveRepresentation: Best move found, or None if no moves available
+            GameMove: Best move found, or None if no moves available
         """
         self.Analytics.Reset()
         self.Analytics.StartTimer()
@@ -514,7 +514,7 @@ class AlphaBetaWithOrdering:
         
         Args:
             game_board: Current board state
-            moves: List of MoveRepresentation objects
+            moves: List of GameMove objects
             player: Player making the moves
         
         Returns:

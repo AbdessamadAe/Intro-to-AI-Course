@@ -27,7 +27,7 @@ JUMP_MOVE = 2
 JUMP_DIRECTIONS = [(-2, -2), (-2, 2), (2, -2), (2, 2)]
 
 
-class MoveRepresentation:
+class GameMove:
     """Represents a move in the checkers game."""
     
     def __init__(self, StartingMoveLocation, DestinationLocation):
@@ -43,7 +43,7 @@ class MoveRepresentation:
         return f"Move({self.StartingMoveLocation} -> {self.DestinationLocation})"
     
     def __eq__(self, other):
-        if not isinstance(other, MoveRepresentation):
+        if not isinstance(other, GameMove):
             return False
         return (self.StartingMoveLocation == other.StartingMoveLocation and 
                 self.DestinationLocation == other.DestinationLocation)
