@@ -59,7 +59,11 @@ class Checkers:
         
 
     def play_human_turn(self):
-        """Handle a single turn for the current human player."""
+        """Handle a single turn for the current human player.
+        
+        Handles multi-jump sequences: if a piece jumps and can jump again,
+        the player must continue jumping with the same piece.
+        """
         print(f"\n{'='*50}")
         print(f"Player {self.current_player} Turn # {self.move_number+1}")
 
@@ -72,6 +76,9 @@ class Checkers:
 
         # Keep asking for moves until a valid one is made
         move_successful = False
+        landing_row = None
+        landing_col = None
+        
         while not move_successful:
             start_row, start_col, target_row, target_col = self.get_move_location()
 
@@ -82,12 +89,58 @@ class Checkers:
                     print("Invalid move: You must make a jump when one is available!")
                     continue
             
-            if self.game_board.make_move(start_row, start_col, target_row, target_col, self.current_player):
-                self.move_number += 1
-                print(f"Move {self.move_number} successful")
+            result = self.game_board.make_move(start_row, start_col, target_row, target_col, self.current_player)
+            if result['success']:
+                landing_row = target_row
+                landing_col = target_col
                 move_successful = True
             else:
                 print("Invalid move. Try again.")
+        
+        # Handle multi-jump sequences
+        if result['was_jump']:
+            # If promoted to king, turn ends (standard checkers rule)
+            if result['promoted']:
+                print("Promoted to KING! Turn ends.")
+                self.move_number += 1
+                return
+            
+            # Check for additional jumps from landing position
+            while self.game_board.has_jump_from_position(landing_row, landing_col, self.current_player):
+                print("\n" + "="*50)
+                print(f"⚠ ADDITIONAL JUMP AVAILABLE! You must continue jumping.")
+                self.game_board.display_board()
+                
+                # Get next jump (must start from landing position)
+                jump_made = False
+                while not jump_made:
+                    start_row, start_col, target_row, target_col = self.get_move_location()
+                    
+                    # Validate that move starts from the landing position
+                    if start_row != landing_row or start_col != landing_col:
+                        print(f"Invalid: You must continue jumping with the piece at ({landing_row}, {landing_col})!")
+                        continue
+                    
+                    # Validate that it's a jump (distance = 2)
+                    if abs(target_row - start_row) != 2:
+                        print("Invalid: You must make a jump (distance of 2)!")
+                        continue
+                    
+                    result = self.game_board.make_move(start_row, start_col, target_row, target_col, self.current_player)
+                    if result['success']:
+                        landing_row = target_row
+                        landing_col = target_col
+                        jump_made = True
+                    else:
+                        print("Invalid move. Try again.")
+                
+                # If promoted during multi-jump, turn ends
+                if result['promoted']:
+                    print("Promoted to KING! Turn ends.")
+                    break
+        
+        self.move_number += 1
+        print(f"\nTurn complete! Total moves: {self.move_number}")
         
     def play_game_two_players(self):
         """Main game loop for two human players."""

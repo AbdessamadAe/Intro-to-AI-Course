@@ -210,25 +210,36 @@ class GameBoard:
                             
 
     def make_move(self, start_row, start_col, target_row, target_col, player):
-        """Execute a move on the board if valid."""
+        """Execute a move on the board if valid.
+        
+        Returns:
+            dict with keys:
+                - 'success': bool - whether move was executed
+                - 'was_jump': bool - whether move was a jump (captured opponent)
+                - 'promoted': bool - whether piece was promoted to king
+        """
         if not self.is_valid_move(start_row, start_col, target_row, target_col, player):
-            return False
+            return {'success': False, 'was_jump': False, 'promoted': False}
         
         piece = self.board[start_row][start_col]
+        was_jump = abs(target_row - start_row) == JUMP_MOVE
 
         self.board[start_row][start_col] = EMPTY
         self.board[target_row][target_col] = piece
 
         # Handle jump (capture opponent piece)
-        if abs(target_row - start_row) == JUMP_MOVE:
+        if was_jump:
             mid_row = (start_row + target_row) // 2
             mid_col = (start_col + target_col) // 2
             self.board[mid_row][mid_col] = EMPTY
 
         # King promotion if it reaches the other end
+        promoted = False
         if piece == WHITE and target_row == 0:
             self.board[target_row][target_col] = WHITE_KING
+            promoted = True
         elif piece == BLACK and target_row == BOARD_SIZE - 1:
             self.board[target_row][target_col] = BLACK_KING
+            promoted = True
             
-        return True
+        return {'success': True, 'was_jump': was_jump, 'promoted': promoted}
