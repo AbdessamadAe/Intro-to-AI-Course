@@ -1,4 +1,4 @@
-from GameBoard import GameBoard
+from board import GameBoard
 from constants import WHITE, BLACK
 
 class Checkers:
