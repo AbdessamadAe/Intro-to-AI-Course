@@ -65,11 +65,23 @@ class Checkers:
 
         self.game_board.display_board()
 
+        # Check if jumps are available (mandatory jump rule)
+        jumps_available = self.game_board.has_jump(self.current_player)
+        if jumps_available:
+            print(f"⚠ JUMP AVAILABLE! You must jump.")
+
         # Keep asking for moves until a valid one is made
         move_successful = False
         while not move_successful:
             start_row, start_col, target_row, target_col = self.get_move_location()
 
+            # Check if attempting a simple move when jumps are mandatory
+            if jumps_available:
+                move_distance = abs(target_row - start_row)
+                if move_distance == 1:
+                    print("Invalid move: You must make a jump when one is available!")
+                    continue
+            
             if self.game_board.make_move(start_row, start_col, target_row, target_col, self.current_player):
                 self.move_number += 1
                 print(f"Move {self.move_number} successful")
