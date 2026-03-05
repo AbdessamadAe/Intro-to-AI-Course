@@ -186,7 +186,6 @@ class Checkers:
     def play_game_two_players(self):
         """Main game loop for two human players."""
         while True:
-            # Check for game over BEFORE player's turn (better UX)
             if self.is_game_over():
                 break
             
@@ -282,7 +281,6 @@ class Checkers:
         self.current_player = WHITE
         
         while True:
-            # Check for game over
             if self.is_game_over():
                 break
             
