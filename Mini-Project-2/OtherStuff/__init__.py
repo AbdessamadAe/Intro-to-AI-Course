@@ -1,5 +1,5 @@
 """
-Constants for the Checkers game.
+OtherStuff Package - Constants, Utilities, and Analytics for Checkers Game
 """
 
 # Board dimensions
@@ -13,8 +13,8 @@ BLACK_KING = 'b'
 EMPTY = '.'
 
 # Initial board setup rows
-BLACK_ROWS = (0, 1, 2)  # Black pieces start in top 3 rows
-WHITE_ROWS = (5, 6, 7)  # White pieces start in bottom 3 rows
+BLACK_ROWS = (0, 1, 2)
+WHITE_ROWS = (5, 6, 7)
 
 # Move distances
 SIMPLE_MOVE = 1

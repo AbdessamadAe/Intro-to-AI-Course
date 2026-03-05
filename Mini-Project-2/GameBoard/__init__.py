@@ -1,6 +1,9 @@
+"""
+GameBoard Package - Board State and Move Validation for Checkers
+"""
 
-from constants import (BOARD_SIZE, WHITE, BLACK, WHITE_KING, BLACK_KING, EMPTY,
-                       BLACK_ROWS, WHITE_ROWS, SIMPLE_MOVE, JUMP_MOVE, JUMP_DIRECTIONS)
+from OtherStuff import (BOARD_SIZE, WHITE, BLACK, WHITE_KING, BLACK_KING, EMPTY,
+                        BLACK_ROWS, WHITE_ROWS, SIMPLE_MOVE, JUMP_MOVE, JUMP_DIRECTIONS)
 
 class GameBoard:
     def __init__(self):
@@ -17,17 +20,13 @@ class GameBoard:
 
     def setup_initial_board(self):
         """Set up the initial checker pieces on the board."""
-        # BLACK pieces - top 3 rows
         for row in BLACK_ROWS:
             for col in range(BOARD_SIZE):
-                # Checkerboard pattern: odd columns for rows 0,2; even columns for row 1
                 if (row % 2 == 0 and col % 2 == 1) or (row % 2 == 1 and col % 2 == 0):
                     self.board[row][col] = BLACK
 
-        # WHITE pieces - bottom 3 rows
         for row in WHITE_ROWS:
             for col in range(BOARD_SIZE):
-                # Checkerboard pattern: even columns for rows 5,7; odd columns for row 6
                 if (row % 2 == 0 and col % 2 == 1) or (row % 2 == 1 and col % 2 == 0):
                     self.board[row][col] = WHITE
 
