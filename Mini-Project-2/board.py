@@ -97,54 +97,89 @@ class GameBoard:
         
         return False
 
-    def has_jump(self, player):
-        """Check if the player has any available jump moves."""
-        for row in range(BOARD_SIZE):
-            for col in range(BOARD_SIZE):
-                if self.board[row][col] in [player, player.lower()]:  # the player's piece
-                    if self.has_jump_from_position(row, col, player):
-                        return True
-        return False
+    def _is_king(self, piece):
+        """Check if a piece is a king (kings are lowercase: 'w' or 'b')."""
+        return piece.islower()
+    
+    def _is_backward_direction(self, player, row_offset):
+        """Check if a move direction is backwards for a regular (non-king) piece.
+        
+        WHITE pieces move up (negative row offset), so positive offset is backwards.
+        BLACK pieces move down (positive row offset), so negative offset is backwards.
+        """
+        if player == WHITE:
+            return row_offset > 0  # Moving down is backwards for WHITE
+        else:  # player == BLACK
+            return row_offset < 0  # Moving up is backwards for BLACK
+    
+    def _can_jump_in_direction(self, row, col, row_offset, col_offset, player):
+        """Check if a piece can jump in a specific direction.
+        
+        Returns True if:
+        - Target square is on board and empty
+        - Middle square contains an enemy piece
+        - Direction is valid for piece type (kings can go any direction)
+        """
+        piece = self.board[row][col]
+        
+        # Regular pieces can't jump backwards
+        if not self._is_king(piece) and self._is_backward_direction(player, row_offset):
+            return False
+        
+        # Calculate target and middle positions
+        target_row = row + row_offset
+        target_col = col + col_offset
+        middle_row = (row + target_row) // 2
+        middle_col = (col + target_col) // 2
+        
+        # Check boundaries and if target is empty
+        if not (0 <= target_row < BOARD_SIZE and 0 <= target_col < BOARD_SIZE):
+            return False
+        if self.board[target_row][target_col] != EMPTY:
+            return False
+        
+        # Check if middle square has enemy piece
+        middle_piece = self.board[middle_row][middle_col]
+        if middle_piece == EMPTY or middle_piece.upper() == player.upper():
+            return False
+        
+        return True
 
     def has_jump_from_position(self, row, col, player):
-        """Check if a specific piece at (row, col) has any available jump moves.
+        """Check if the piece at (row, col) can jump to capture an opponent.
         
-        Note: Regular pieces cannot jump backwards, only kings can jump in all directions.
+        Returns True if at least one jump is available from this position.
         """
         piece = self.board[row][col]
         if piece not in [player, player.lower()]:
             return False
         
-        is_king = (piece.islower())  # Kings are lowercase
+        # Check all four diagonal jump directions
+        for row_offset, col_offset in JUMP_DIRECTIONS:
+            if self._can_jump_in_direction(row, col, row_offset, col_offset, player):
+                return True
+        return False
+
+    def has_jump(self, player):
+        """Check if the player has any pieces that can make a jump.
         
-        for jump_row, jump_col in JUMP_DIRECTIONS:
-            # Skip backward jumps for regular pieces
-            if not is_king:
-                if player == WHITE and jump_row > 0:  # WHITE can't jump down (backwards)
-                    continue
-                if player == BLACK and jump_row < 0:  # BLACK can't jump up (backwards)
-                    continue
-            
-            new_row = row + jump_row
-            new_col = col + jump_col
-            
-            # Check if target is valid and empty
-            if 0 <= new_row < BOARD_SIZE and 0 <= new_col < BOARD_SIZE and self.board[new_row][new_col] == EMPTY:
-                # Check for enemy in the middle
-                middle_row = (row + new_row) // 2
-                middle_col = (col + new_col) // 2
-                enemy_there = self.board[middle_row][middle_col]
-                
-                if enemy_there != EMPTY and enemy_there.upper() != player.upper():
-                    return True
+        Returns True if at least one jump is available anywhere on the board.
+        """
+        for row in range(BOARD_SIZE):
+            for col in range(BOARD_SIZE):
+                piece = self.board[row][col]
+                if piece in [player, player.lower()]:
+                    if self.has_jump_from_position(row, col, player):
+                        return True
         return False
 
     def has_any_legal_move(self, player):
         """Check if the player has any legal moves available.
         
         Respects mandatory jump rule: if any jumps exist, only jumps are legal moves.
+        Returns True if at least one legal move exists, False otherwise (stalemate).
         """
-        # First check if any jumps are available
+        # Check if any jumps are available (mandatory jump rule)
         jumps_available = self.has_jump(player)
         
         for row in range(BOARD_SIZE):
@@ -158,18 +193,12 @@ class GameBoard:
                     if self.has_jump_from_position(row, col, player):
                         return True
                 else:
-                    # Check for simple moves (1 square diagonally)
-                    is_king = piece.islower()
-                    
-                    # Try all 4 diagonal directions
+                    # Check for simple moves (1 square diagonally in all 4 directions)
                     for row_offset in [-1, 1]:
                         for col_offset in [-1, 1]:
                             # Skip backward moves for regular pieces
-                            if not is_king:
-                                if player == WHITE and row_offset > 0:  # WHITE can't move down
-                                    continue
-                                if player == BLACK and row_offset < 0:  # BLACK can't move up
-                                    continue
+                            if not self._is_king(piece) and self._is_backward_direction(player, row_offset):
+                                continue
                             
                             target_row = row + row_offset
                             target_col = col + col_offset
