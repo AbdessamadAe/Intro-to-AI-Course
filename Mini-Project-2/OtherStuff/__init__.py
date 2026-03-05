@@ -47,10 +47,19 @@ class GameMove:
             return False
         return (self.StartingMoveLocation == other.StartingMoveLocation and 
                 self.DestinationLocation == other.DestinationLocation)
+    
+    def Describe(self):
+        """Returns a text description of the move.
+        
+        Converts 0-indexed coordinates to 1-indexed for display.
+        """
+        start_row, start_col = self.StartingMoveLocation
+        end_row, end_col = self.DestinationLocation
+        return f"({start_row+1},{start_col+1}) -> ({end_row+1},{end_col+1})"
 
 
 class AnalyticsTracker:
-    """Tracks analytics for AI search algorithms."""
+    """Tracks analytics for a single AI search."""
     
     def __init__(self, SearchStrategy):
         """
@@ -120,3 +129,79 @@ class AnalyticsTracker:
         print(f"Time Elapsed:       {self.GetTimeElapsed():.4f} seconds")
         print(f"Space Complexity:   O({self.GetSpaceComplexity()})")
         print(f"{'='*60}\n")
+
+
+class AnalyticsManager:
+    """Tracks cumulative analytics across all moves for both players."""
+    
+    def __init__(self):
+        self.CumulativeWhite = {
+            "NumberNodesExpanded": 0,
+            "NumberPrunes": 0,
+            "TotalMoves": 0,
+            "MaxDepthReached": 0,
+        }
+        self.CumulativeBlack = {
+            "NumberNodesExpanded": 0,
+            "NumberPrunes": 0,
+            "TotalMoves": 0,
+            "MaxDepthReached": 0,
+        }
+        self.PerMoveReports = []
+    
+    def RecordMoveAnalytics(self, Player, Metrics, MoveText):
+        """Record per-move analytics and update cumulative stats.
+        
+        Args:
+            Player: 'white' or 'black'
+            Metrics: Dict with NumberNodesExpanded, NumberPrunes, etc.
+            MoveText: String description of the move
+        """
+        report = {
+            "Player": Player,
+            "MoveText": MoveText,
+            "NumberNodesExpanded": Metrics.get("NumberNodesExpanded", 0),
+            "NumberPrunes": Metrics.get("NumberPrunes", 0),
+            "MaxDepthReached": Metrics.get("MaxDepthReached", 0),
+            "LastSearchMillis": Metrics.get("LastSearchMillis", 0),
+            "Strategy": Metrics.get("Strategy", "Unknown"),
+        }
+        self.PerMoveReports.append(report)
+        
+        cum = self.CumulativeWhite if Player == "white" else self.CumulativeBlack
+        cum["NumberNodesExpanded"] += report["NumberNodesExpanded"]
+        cum["NumberPrunes"] += report["NumberPrunes"]
+        cum["TotalMoves"] += 1
+        cum["MaxDepthReached"] = max(cum["MaxDepthReached"], report["MaxDepthReached"])
+    
+    def PrintLastMoveAnalytics(self):
+        """Print analytics for the last move."""
+        if not self.PerMoveReports:
+            return
+        rpt = self.PerMoveReports[-1]
+        print("\nAnalytics for this move:")
+        print(f"- Player: {rpt['Player']}")
+        print(f"- Move: {rpt['MoveText']}")
+        print(f"- States expanded: {rpt['NumberNodesExpanded']}")
+        print(f"- Prunes: {rpt['NumberPrunes']}")
+        print(f"- Max depth: {rpt['MaxDepthReached']}")
+        print(f"- Search time: {rpt['LastSearchMillis']} ms")
+        print(f"- Strategy: {rpt['Strategy']}")
+    
+    def PrintCumulativeAnalytics(self):
+        """Print cumulative analytics for both players."""
+        print("\n" + "="*60)
+        print("CUMULATIVE ANALYTICS")
+        print("="*60)
+        print("\nWhite:")
+        self._PrintCumulative(self.CumulativeWhite)
+        print("\nBlack:")
+        self._PrintCumulative(self.CumulativeBlack)
+        print("="*60)
+    
+    def _PrintCumulative(self, cum):
+        """Helper to print cumulative stats for one player."""
+        print(f"  Moves: {cum['TotalMoves']}")
+        print(f"  States expanded: {cum['NumberNodesExpanded']}")
+        print(f"  Prunes: {cum['NumberPrunes']}")
+        print(f"  Max depth reached: {cum['MaxDepthReached']}")
