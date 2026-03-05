@@ -4,6 +4,7 @@ PlayingTheGame Package - Game Controller for Checkers
 
 from GameBoard import GameBoard
 from OtherStuff import WHITE, BLACK
+from SearchToolBox import MinimaxSearch, AlphaBetaSearch, AlphaBetaWithOrdering
 
 class Checkers:
     """
@@ -164,4 +165,97 @@ class Checkers:
             self.switch_player()
     
         print("\nGAME OVER!")
+        self.game_board.display_board()
+    
+    def play_ai_turn(self, search_algorithm):
+        """Handle a single turn for the AI player.
+        
+        Note: This simplified version only handles single moves.
+        Multi-jump sequences for AI will be handled by the search algorithm.
+        
+        Args:
+            search_algorithm: Instance of MinimaxSearch, AlphaBetaSearch, or AlphaBetaWithOrdering
+        """
+        print(f"\n{'='*50}")
+        print(f"AI Player {self.current_player} Turn # {self.move_number+1}")
+        print("Thinking...")
+        
+        self.game_board.display_board()
+        
+        # Get best move from AI
+        best_move = search_algorithm.GetBestMove(self.game_board, self.current_player)
+        
+        if best_move is None:
+            print("AI has no legal moves!")
+            self.move_number += 1
+            return
+        
+        # Extract move information
+        start_row, start_col = best_move.StartingMoveLocation
+        target_row, target_col = best_move.DestinationLocation
+        
+        print(f"AI moves from ({start_row}, {start_col}) to ({target_row}, {target_col})")
+        
+        # Execute the move
+        result = self.game_board.make_move(start_row, start_col, target_row, target_col, self.current_player)
+        
+        if result['success']:
+            if result['promoted']:
+                print("AI piece promoted to KING!")
+            if result['was_jump']:
+                print("AI captured an opponent piece!")
+        
+        # Display analytics
+        search_algorithm.Analytics.PrintAnalytics()
+        
+        self.move_number += 1
+        print(f"\nAI turn complete! Total moves: {self.move_number}")
+    
+    def play_game_human_vs_ai(self, SearchStrategy='AlphaBetaOrdering', MaxDepth=7, TimeLimit=3.0):
+        """Main game loop for human (WHITE) vs AI (BLACK).
+        
+        Args:
+            SearchStrategy: 'Minimax', 'AlphaBeta', or 'AlphaBetaOrdering'
+            MaxDepth: Maximum search depth (plies) - recommended 5-9
+            TimeLimit: Maximum time for AI to think (seconds)
+        """
+        print("\n" + "="*60)
+        print("CHECKERS: HUMAN (WHITE) vs AI (BLACK)")
+        print("="*60)
+        print(f"AI Strategy: {SearchStrategy}")
+        print(f"Max Depth: {MaxDepth} plies")
+        print(f"Time Limit: {TimeLimit} seconds")
+        print("="*60 + "\n")
+        
+        # Initialize AI search algorithm
+        if SearchStrategy == 'Minimax':
+            ai_search = MinimaxSearch(MaxDepth, TimeLimit)
+        elif SearchStrategy == 'AlphaBeta':
+            ai_search = AlphaBetaSearch(MaxDepth, TimeLimit)
+        elif SearchStrategy == 'AlphaBetaOrdering':
+            ai_search = AlphaBetaWithOrdering(MaxDepth, TimeLimit)
+        else:
+            print(f"Unknown search strategy: {SearchStrategy}. Using AlphaBetaOrdering.")
+            ai_search = AlphaBetaWithOrdering(MaxDepth, TimeLimit)
+        
+        # Set initial player to WHITE (human goes first)
+        self.current_player = WHITE
+        
+        while True:
+            # Check for game over
+            if self.is_game_over():
+                break
+            
+            # Human's turn (WHITE)
+            if self.current_player == WHITE:
+                self.play_human_turn()
+            # AI's turn (BLACK)
+            else:
+                self.play_ai_turn(ai_search)
+            
+            self.switch_player()
+        
+        print("\n" + "="*60)
+        print("GAME OVER!")
+        print("="*60)
         self.game_board.display_board()
