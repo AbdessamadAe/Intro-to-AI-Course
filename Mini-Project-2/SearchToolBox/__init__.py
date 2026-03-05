@@ -238,6 +238,8 @@ class MinimaxSearch:
         """
         self.Analytics.Reset()
         self.Analytics.StartTimer()
+        start_time = time.time()
+        deadline = start_time + self.TimeLimit
         
         best_move = None
         best_value = float('-inf')
@@ -249,13 +251,16 @@ class MinimaxSearch:
             return None
         
         for move in legal_moves:
+            if time.time() >= deadline:
+                break
             new_board = ApplyMove(game_board, move)
             
             move_value = self._MinimaxRecursive(
                 new_board,
                 self.MaxDepth - 1,
                 False,
-                player
+                player,
+                deadline
             )
             
             if move_value > best_value:
@@ -265,7 +270,7 @@ class MinimaxSearch:
         self.Analytics.StopTimer()
         return best_move
     
-    def _MinimaxRecursive(self, game_board, depth, is_maximizing, ai_player):
+    def _MinimaxRecursive(self, game_board, depth, is_maximizing, ai_player, deadline):
         """Recursive Minimax implementation.
         
         Args:
@@ -273,10 +278,15 @@ class MinimaxSearch:
             depth: Remaining depth to search
             is_maximizing: True if maximizing player's turn
             ai_player: The AI player (for evaluation)
+            deadline: Time deadline for search termination
         
         Returns:
             float: Evaluation score
         """
+        # Check time limit
+        if time.time() >= deadline:
+            return EvaluateBoardState(game_board, ai_player)
+        
         self.Analytics.IncrementNodesExpanded()
         self.Analytics.UpdateMaxDepth(self.MaxDepth - depth)
         
@@ -295,14 +305,14 @@ class MinimaxSearch:
             max_eval = float('-inf')
             for move in legal_moves:
                 new_board = ApplyMove(game_board, move)
-                eval_score = self._MinimaxRecursive(new_board, depth - 1, False, ai_player)
+                eval_score = self._MinimaxRecursive(new_board, depth - 1, False, ai_player, deadline)
                 max_eval = max(max_eval, eval_score)
             return max_eval
         else:
             min_eval = float('inf')
             for move in legal_moves:
                 new_board = ApplyMove(game_board, move)
-                eval_score = self._MinimaxRecursive(new_board, depth - 1, True, ai_player)
+                eval_score = self._MinimaxRecursive(new_board, depth - 1, True, ai_player, deadline)
                 min_eval = min(min_eval, eval_score)
             return min_eval
 
@@ -332,6 +342,8 @@ class AlphaBetaSearch:
         """
         self.Analytics.Reset()
         self.Analytics.StartTimer()
+        start_time = time.time()
+        deadline = start_time + self.TimeLimit
         
         best_move = None
         best_value = float('-inf')
@@ -345,6 +357,8 @@ class AlphaBetaSearch:
             return None
         
         for move in legal_moves:
+            if time.time() >= deadline:
+                break
             new_board = ApplyMove(game_board, move)
             
             move_value = self._AlphaBetaRecursive(
@@ -353,7 +367,8 @@ class AlphaBetaSearch:
                 alpha,
                 beta,
                 False,
-                player
+                player,
+                deadline
             )
             
             if move_value > best_value:
@@ -365,7 +380,7 @@ class AlphaBetaSearch:
         self.Analytics.StopTimer()
         return best_move
     
-    def _AlphaBetaRecursive(self, game_board, depth, alpha, beta, is_maximizing, ai_player):
+    def _AlphaBetaRecursive(self, game_board, depth, alpha, beta, is_maximizing, ai_player, deadline):
         """Recursive Alpha-Beta implementation.
         
         Args:
@@ -375,10 +390,15 @@ class AlphaBetaSearch:
             beta: Beta value for pruning
             is_maximizing: True if maximizing player's turn
             ai_player: The AI player (for evaluation)
+            deadline: Time deadline for search termination
         
         Returns:
             float: Evaluation score
         """
+        # Check time limit
+        if time.time() >= deadline:
+            return EvaluateBoardState(game_board, ai_player)
+        
         self.Analytics.IncrementNodesExpanded()
         self.Analytics.UpdateMaxDepth(self.MaxDepth - depth)
         
@@ -397,7 +417,7 @@ class AlphaBetaSearch:
             max_eval = float('-inf')
             for move in legal_moves:
                 new_board = ApplyMove(game_board, move)
-                eval_score = self._AlphaBetaRecursive(new_board, depth - 1, alpha, beta, False, ai_player)
+                eval_score = self._AlphaBetaRecursive(new_board, depth - 1, alpha, beta, False, ai_player, deadline)
                 max_eval = max(max_eval, eval_score)
                 alpha = max(alpha, eval_score)
                 if beta <= alpha:
@@ -408,7 +428,7 @@ class AlphaBetaSearch:
             min_eval = float('inf')
             for move in legal_moves:
                 new_board = ApplyMove(game_board, move)
-                eval_score = self._AlphaBetaRecursive(new_board, depth - 1, alpha, beta, True, ai_player)
+                eval_score = self._AlphaBetaRecursive(new_board, depth - 1, alpha, beta, True, ai_player, deadline)
                 min_eval = min(min_eval, eval_score)
                 beta = min(beta, eval_score)
                 if beta <= alpha:
@@ -442,6 +462,8 @@ class AlphaBetaWithOrdering:
         """
         self.Analytics.Reset()
         self.Analytics.StartTimer()
+        start_time = time.time()
+        deadline = start_time + self.TimeLimit
         
         best_move = None
         best_value = float('-inf')
@@ -458,6 +480,8 @@ class AlphaBetaWithOrdering:
         ordered_moves = self._OrderMoves(game_board, legal_moves, player)
         
         for move in ordered_moves:
+            if time.time() >= deadline:
+                break
             new_board = ApplyMove(game_board, move)
             
             move_value = self._AlphaBetaRecursive(
@@ -466,7 +490,8 @@ class AlphaBetaWithOrdering:
                 alpha,
                 beta,
                 False,
-                player
+                player,
+                deadline
             )
             
             if move_value > best_value:
@@ -525,7 +550,7 @@ class AlphaBetaWithOrdering:
         
         return sorted(moves, key=move_priority, reverse=True)
     
-    def _AlphaBetaRecursive(self, game_board, depth, alpha, beta, is_maximizing, ai_player):
+    def _AlphaBetaRecursive(self, game_board, depth, alpha, beta, is_maximizing, ai_player, deadline):
         """Recursive Alpha-Beta implementation with move ordering.
         
         Args:
@@ -535,10 +560,15 @@ class AlphaBetaWithOrdering:
             beta: Beta value for pruning
             is_maximizing: True if maximizing player's turn
             ai_player: The AI player (for evaluation)
+            deadline: Time deadline for search termination
         
         Returns:
             float: Evaluation score
         """
+        # Check time limit
+        if time.time() >= deadline:
+            return EvaluateBoardState(game_board, ai_player)
+        
         self.Analytics.IncrementNodesExpanded()
         self.Analytics.UpdateMaxDepth(self.MaxDepth - depth)
         
@@ -560,7 +590,7 @@ class AlphaBetaWithOrdering:
             max_eval = float('-inf')
             for move in ordered_moves:
                 new_board = ApplyMove(game_board, move)
-                eval_score = self._AlphaBetaRecursive(new_board, depth - 1, alpha, beta, False, ai_player)
+                eval_score = self._AlphaBetaRecursive(new_board, depth - 1, alpha, beta, False, ai_player, deadline)
                 max_eval = max(max_eval, eval_score)
                 alpha = max(alpha, eval_score)
                 if beta <= alpha:
@@ -571,7 +601,7 @@ class AlphaBetaWithOrdering:
             min_eval = float('inf')
             for move in ordered_moves:
                 new_board = ApplyMove(game_board, move)
-                eval_score = self._AlphaBetaRecursive(new_board, depth - 1, alpha, beta, True, ai_player)
+                eval_score = self._AlphaBetaRecursive(new_board, depth - 1, alpha, beta, True, ai_player, deadline)
                 min_eval = min(min_eval, eval_score)
                 beta = min(beta, eval_score)
                 if beta <= alpha:
