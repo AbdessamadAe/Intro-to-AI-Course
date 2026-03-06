@@ -1,0 +1,53 @@
+============================================================
+CHECKERS GAME LOG
+============================================================
+Date/Time:    2026-03-06 21:07:00
+Mode:         Human vs AI
+Interface:    GUI
+
+AI Configuration:
+  Strategy:   AlphaBetaOrdering
+  Max Depth:  7
+  Time Limit: 3.0s
+
+------------------------------------------------------------
+MOVE HISTORY
+------------------------------------------------------------
+  Game started
+  ──────────────────────
+  1. ○ (6,3) → (5,4)
+  2. ● AI (3,6) → (4,7)
+  3. ○ (5,4) → (4,3)
+  4. ● AI (3,2) → (5,4)  ×capture
+
+------------------------------------------------------------
+AI MOVE ANALYTICS
+------------------------------------------------------------
+Move 2  BLACK AI  (3,6)->(4,7)
+  Nodes Expanded : 2,849
+  Nodes Pruned   : 606
+  Max Depth      : 7
+  Time Elapsed   : 0.405s
+Move 4  BLACK AI  (3,2)->(5,4)
+  Nodes Expanded : 186
+  Nodes Pruned   : 32
+  Max Depth      : 7
+  Time Elapsed   : 0.054s
+
+------------------------------------------------------------
+CUMULATIVE AI STATISTICS
+------------------------------------------------------------
+  Total AI Moves       : 2
+  Total Nodes Expanded : 3,035
+  Total Nodes Pruned   : 638
+  Max Depth Reached    : 7
+  Total Search Time    : 0.459s
+  Avg Time per Move    : 0.230s
+
+------------------------------------------------------------
+RESULT
+------------------------------------------------------------
+  Winner      : N/A (incomplete)
+  Total Moves : 4
+
+============================================================
