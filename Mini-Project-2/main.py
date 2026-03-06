@@ -26,8 +26,8 @@ def get_ai_configuration():
     print("="*60)
     print("\nSearch Strategies:")
     print("1. Minimax (basic)")
-    print("2. AlphaBeta (efficient)")
-    print("3. AlphaBetaOrdering (recommended)")
+    print("2. Minimax + AlphaBeta Pruning (efficient)")
+    print("3. Minimax + AlphaBeta with Ordering (recommended)")
     
     while True:
         try:

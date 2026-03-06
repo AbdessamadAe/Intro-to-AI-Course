@@ -96,6 +96,8 @@ class CheckerGUI:
         self.ai_player = BLACK
         self.ai_depth = ai_depth
         self.ai_time_limit = ai_time_limit
+        self.ai_move_logs = []
+        self.game_start_time = time.time()
         if ai_enabled:
             strategies = {
                 'Minimax':            MinimaxSearch,
@@ -107,6 +109,7 @@ class CheckerGUI:
             self.ai_strategy_name = ai_strategy
  
         self._build_ui()
+        self.root.protocol('WM_DELETE_WINDOW', self._on_close)
         self.draw_board()
         self.root.mainloop()
  
@@ -478,6 +481,7 @@ class CheckerGUI:
             h.insert(tk.END, f'  {winner} WINS!\n', tag)
             h.config(state='disabled')
             h.see(tk.END)
+            self._save_log(winner)
             return True
         return False
  
@@ -593,6 +597,15 @@ class CheckerGUI:
 
         if hasattr(self.ai_search, 'Analytics'):
             self.update_analytics_display(self.ai_search.Analytics)
+            a = self.ai_search.Analytics
+            self.ai_move_logs.append({
+                'move_num':  self.move_counter,
+                'move_text': f'BLACK AI  ({sr+1},{sc+1})→({tr+1},{tc+1})',
+                'nodes':     a.NumberNodesExpanded,
+                'prunes':    a.NumberNodesPruned,
+                'depth':     a.MaxDepthReached,
+                'time':      a.GetTimeElapsed() if hasattr(a, 'GetTimeElapsed') else 0.0,
+            })
 
         desc = f'AI  ({sr+1},{sc+1}) → ({tr+1},{tc+1})'
         if result['was_jump']:
@@ -604,7 +617,45 @@ class CheckerGUI:
 
         if not self.check_game_over():
             self.switch_turn()
- 
+
+    def _save_log(self, winner=None):
+        from OtherStuff import save_game_log
+        mode = 'Human vs AI' if self.ai_enabled else 'Human vs Human'
+        ai_config = None
+        if self.ai_enabled:
+            ai_config = {
+                'strategy':   self.ai_strategy_name,
+                'depth':      self.ai_depth,
+                'time_limit': self.ai_time_limit,
+            }
+        history = []
+        raw = self.history_text.get('1.0', tk.END).strip().splitlines()
+        for line in raw:
+            line = line.strip()
+            if line:
+                history.append(line)
+        log_data = {
+            'mode':          mode,
+            'interface':     'GUI',
+            'winner':        winner,
+            'total_moves':   self.move_counter,
+            'move_history':  history,
+            'ai_config':     ai_config,
+            'ai_move_logs':  self.ai_move_logs,
+        }
+        path = save_game_log(log_data)
+        print(f'Analytics log saved → {path}')
+
+    def _on_close(self):
+        if self.move_counter > 0:
+            winner = None
+            if self.game_over:
+                w = sum(1 for row in self.game_board.board for c in row if c.upper() == WHITE)
+                b = sum(1 for row in self.game_board.board for c in row if c.upper() == BLACK)
+                winner = 'WHITE' if b == 0 else ('BLACK' if w == 0 else None)
+            self._save_log(winner)
+        self.root.destroy()
+
 
 if __name__ == '__main__':
     CheckerGUI()

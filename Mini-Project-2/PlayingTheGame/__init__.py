@@ -3,7 +3,7 @@ PlayingTheGame Package - Game Controller for Checkers
 """
 
 from GameBoard import GameBoard
-from OtherStuff import WHITE, BLACK, AnalyticsManager
+from OtherStuff import WHITE, BLACK, AnalyticsManager, save_game_log
 from SearchToolBox import MinimaxSearch, AlphaBetaSearch, AlphaBetaWithOrdering
 
 class Checkers:
@@ -50,6 +50,46 @@ class Checkers:
             self.current_player = BLACK
         else:
             self.current_player = WHITE
+
+    def _get_winner(self):
+        w = sum(1 for row in self.game_board.board for c in row if c.upper() == WHITE)
+        b = sum(1 for row in self.game_board.board for c in row if c.upper() == BLACK)
+        if b == 0:
+            return 'WHITE'
+        if w == 0:
+            return 'BLACK'
+        if not self.game_board.has_any_legal_move(self.current_player):
+            return BLACK if self.current_player == WHITE else WHITE
+        return None
+
+    def _save_console_log(self, mode, winner, ai_config=None):
+        ai_logs = []
+        history = []
+        for rpt in self.Analytics.PerMoveReports:
+            player_icon = '○ WHITE' if rpt['Player'] == 'white' else '● BLACK AI'
+            num = len(history) + 1
+            entry = f"{num:>3}. {player_icon}  {rpt['MoveText']}"
+            history.append(entry)
+            if rpt['Player'] == 'black':
+                ai_logs.append({
+                    'move_num':  num,
+                    'move_text': f"BLACK AI  {rpt['MoveText']}",
+                    'nodes':     rpt['NumberNodesExpanded'],
+                    'prunes':    rpt['NumberPrunes'],
+                    'depth':     rpt['MaxDepthReached'],
+                    'time':      rpt['LastSearchMillis'] / 1000.0,
+                })
+        log_data = {
+            'mode':         mode,
+            'interface':    'Console',
+            'winner':       winner,
+            'total_moves':  self.move_number,
+            'move_history': history,
+            'ai_config':    ai_config,
+            'ai_move_logs': ai_logs,
+        }
+        path = save_game_log(log_data)
+        print(f'\nAnalytics log saved → {path}')
 
     def get_move_location(self):
         """Get starting and target locations for a move from user input."""
@@ -194,7 +234,8 @@ class Checkers:
     
         print("\nGAME OVER!")
         self.game_board.display_board()
-    
+        self._save_console_log(mode='Human vs Human', winner=self._get_winner())
+
     def play_ai_turn(self, search_algorithm):
         """Handle a single turn for the AI player.
         
@@ -297,3 +338,9 @@ class Checkers:
         print("GAME OVER!")
         print("="*60)
         self.game_board.display_board()
+        self.Analytics.PrintCumulativeAnalytics()
+        self._save_console_log(
+            mode='Human vs AI',
+            winner=self._get_winner(),
+            ai_config={'strategy': SearchStrategy, 'depth': MaxDepth, 'time_limit': TimeLimit}
+        )

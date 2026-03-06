@@ -205,3 +205,93 @@ class AnalyticsManager:
         print(f"  States expanded: {cum['NumberNodesExpanded']}")
         print(f"  Prunes: {cum['NumberPrunes']}")
         print(f"  Max depth reached: {cum['MaxDepthReached']}")
+
+
+def save_game_log(log_data, log_dir=None):
+    """Save a structured game analytics log to a timestamped text file.
+
+    Args:
+        log_data (dict): Keys:
+            mode        - 'Human vs Human' or 'Human vs AI'
+            interface   - 'Console' or 'GUI'
+            winner      - 'WHITE', 'BLACK', or None
+            total_moves - int
+            move_history- list of str
+            ai_config   - dict with strategy/depth/time_limit, or None
+            ai_move_logs- list of dicts (nodes, prunes, depth, time, move_text)
+        log_dir (str): Directory to save logs; defaults to analytics-logs/ inside project root.
+    """
+    import os
+    from datetime import datetime
+
+    if log_dir is None:
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        log_dir = os.path.join(project_root, 'analytics-logs')
+
+    os.makedirs(log_dir, exist_ok=True)
+
+    timestamp = datetime.now()
+    filename = timestamp.strftime('game_%Y%m%d_%H%M%S.txt')
+    filepath = os.path.join(log_dir, filename)
+
+    sep  = '=' * 60
+    dash = '-' * 60
+
+    lines = []
+    lines += [sep, 'CHECKERS GAME LOG', sep]
+    lines += [f"Date/Time:    {timestamp.strftime('%Y-%m-%d %H:%M:%S')}"]
+    lines += [f"Mode:         {log_data.get('mode', 'Unknown')}"]
+    lines += [f"Interface:    {log_data.get('interface', 'Unknown')}"]
+
+    ai_config = log_data.get('ai_config')
+    if ai_config:
+        lines += ['', 'AI Configuration:']
+        lines += [f"  Strategy:   {ai_config.get('strategy', '?')}"]
+        lines += [f"  Max Depth:  {ai_config.get('depth', '?')}"]
+        lines += [f"  Time Limit: {ai_config.get('time_limit', '?')}s"]
+
+    lines += ['', dash, 'MOVE HISTORY', dash]
+    for entry in log_data.get('move_history', []):
+        lines.append(f'  {entry}')
+
+    ai_logs = log_data.get('ai_move_logs', [])
+    if ai_logs:
+        lines += ['', dash, 'AI MOVE ANALYTICS', dash]
+        total_nodes = 0
+        total_prunes = 0
+        total_time = 0.0
+        max_depth_seen = 0
+        for i, entry in enumerate(ai_logs, 1):
+            lines += [f"Move {entry.get('move_num', i)}  {entry.get('move_text', '')}"]
+            nodes  = entry.get('nodes', 0)
+            prunes = entry.get('prunes', 0)
+            depth  = entry.get('depth', 0)
+            elapsed = entry.get('time', 0.0)
+            lines += [f"  Nodes Expanded : {nodes:,}"]
+            lines += [f"  Nodes Pruned   : {prunes:,}"]
+            lines += [f"  Max Depth      : {depth}"]
+            lines += [f"  Time Elapsed   : {elapsed:.3f}s"]
+            total_nodes  += nodes
+            total_prunes += prunes
+            total_time   += elapsed
+            max_depth_seen = max(max_depth_seen, depth)
+
+        avg_time = total_time / len(ai_logs) if ai_logs else 0.0
+        lines += ['', dash, 'CUMULATIVE AI STATISTICS', dash]
+        lines += [f"  Total AI Moves       : {len(ai_logs)}"]
+        lines += [f"  Total Nodes Expanded : {total_nodes:,}"]
+        lines += [f"  Total Nodes Pruned   : {total_prunes:,}"]
+        lines += [f"  Max Depth Reached    : {max_depth_seen}"]
+        lines += [f"  Total Search Time    : {total_time:.3f}s"]
+        lines += [f"  Avg Time per Move    : {avg_time:.3f}s"]
+
+    lines += ['', dash, 'RESULT', dash]
+    winner = log_data.get('winner')
+    lines += [f"  Winner      : {winner if winner else 'N/A (incomplete)'}"]
+    lines += [f"  Total Moves : {log_data.get('total_moves', 0)}"]
+    lines += ['', sep]
+
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(lines) + '\n')
+
+    return filepath
