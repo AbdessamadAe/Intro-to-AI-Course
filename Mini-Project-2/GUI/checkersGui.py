@@ -448,10 +448,7 @@ class CheckerGUI:
                       text=f'{analytics.NumberNodesPruned:,}')
         ac.itemconfig(self.analytics_labels['depth'],
                       text=f'{analytics.MaxDepthReached}')
-        elapsed = 0
-        if hasattr(analytics, 'SearchEndTime') and hasattr(analytics, 'SearchStartTime'):
-            if analytics.SearchEndTime and analytics.SearchStartTime:
-                elapsed = analytics.SearchEndTime - analytics.SearchStartTime
+        elapsed = analytics.GetTimeElapsed() if hasattr(analytics, 'GetTimeElapsed') else 0
         ac.itemconfig(self.analytics_labels['time'],
                       text=f'{elapsed:.3f}s')
  
