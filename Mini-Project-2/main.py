@@ -118,7 +118,7 @@ def main():
     if interface == '2':  # GUI
         print("\nLaunching GUI...")
         try:
-            from GUI.checkersGui import CheckerGUI
+            from OtherStuff.checkersGui import CheckerGUI
             if game_mode == '1':
                 print("Starting Human vs Human GUI...")
                 app = CheckerGUI(ai_enabled=False)
