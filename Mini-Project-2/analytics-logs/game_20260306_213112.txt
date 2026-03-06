@@ -1,0 +1,195 @@
+============================================================
+CHECKERS GAME LOG
+============================================================
+Date/Time:    2026-03-06 21:31:12
+Mode:         Human vs AI
+Interface:    GUI
+
+AI Configuration:
+  Strategy:   Minimax
+  Max Depth:  9
+  Time Limit: 3.0s
+
+------------------------------------------------------------
+MOVE HISTORY
+------------------------------------------------------------
+  Game started
+  ──────────────────────
+  1. ○ (6,3) → (5,4)
+  2. ● AI (3,2) → (4,1)
+  3. ○ (6,5) → (5,6)
+  4. ● AI (2,1) → (3,2)
+  5. ○ (5,6) → (4,5)
+  6. ● AI (3,4) → (5,6)  ×capture
+  7. ○ (6,7) → (4,5)  ×capture
+  8. ● AI (1,2) → (2,1)
+  9. ○ (7,6) → (6,5)
+  10. ● AI (2,3) → (3,4)
+  11. ○ (6,5) → (5,6)
+  12. ● AI (1,4) → (2,3)
+  13. ○ (5,4) → (4,3)
+  14. ● AI (3,2) → (5,4)  ×capture
+  15. ○ (7,4) → (6,3)
+  16. ● AI (2,1) → (3,2)
+  17. ○ (6,3) → (5,2)
+  18. ● AI (4,1) → (6,3)  ×capture
+  19. ○ (8,3) → (7,4)
+  20. ● AI (3,2) → (4,1)
+  21. ○ (7,4) → (5,2)  ×capture
+  22. ● AI (4,1) → (6,3)  ×capture
+  23. ○ (8,5) → (7,4)
+  24. ● AI (6,3) → (8,5)  ×capture  ♛king!
+  25. ○ (6,1) → (5,2)
+  26. ● AI (2,3) → (3,2)
+  27. ○ (5,2) → (4,3)
+  28. ● AI (3,4) → (5,2)  ×capture
+  29. ○ (7,2) → (6,3)
+  30. ● AI (5,2) → (7,4)  ×capture
+  31. ○ (4,5) → (3,4)
+  32. ● AI (2,5) → (4,3)  ×capture
+  33. ○ (8,1) → (7,2)
+  34. ● AI (1,6) → (2,5)
+  35. ○ (7,2) → (6,3)
+  36. ● AI (5,4) → (7,2)  ×capture
+  37. ○ (5,6) → (4,5)
+  38. ● AI (3,6) → (5,4)  ×capture
+  39. ○ (8,7) → (7,6)
+  40. ● AI (8,5) → (6,7)  ×capture
+  41. ○ (7,8) → (5,6)  ×capture
+  42. ● AI (2,5) → (3,4)
+  43. ○ (5,6) → (4,5)
+  44. ● AI (3,4) → (5,6)  ×capture
+  ──────────────────────
+  BLACK WINS!
+
+------------------------------------------------------------
+AI MOVE ANALYTICS
+------------------------------------------------------------
+Move 2  BLACK AI  (3,2)->(4,1)
+  Nodes Expanded : 13,114
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.006s
+Move 4  BLACK AI  (2,1)->(3,2)
+  Nodes Expanded : 13,297
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.008s
+Move 6  BLACK AI  (3,4)->(5,6)
+  Nodes Expanded : 13,792
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.004s
+Move 8  BLACK AI  (1,2)->(2,1)
+  Nodes Expanded : 13,280
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.006s
+Move 10  BLACK AI  (2,3)->(3,4)
+  Nodes Expanded : 13,697
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.009s
+Move 12  BLACK AI  (1,4)->(2,3)
+  Nodes Expanded : 14,603
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.007s
+Move 14  BLACK AI  (3,2)->(5,4)
+  Nodes Expanded : 14,320
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.006s
+Move 16  BLACK AI  (2,1)->(3,2)
+  Nodes Expanded : 14,709
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.004s
+Move 18  BLACK AI  (4,1)->(6,3)
+  Nodes Expanded : 14,093
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.006s
+Move 20  BLACK AI  (3,2)->(4,1)
+  Nodes Expanded : 15,199
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.004s
+Move 22  BLACK AI  (4,1)->(6,3)
+  Nodes Expanded : 14,586
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.004s
+Move 24  BLACK AI  (6,3)->(8,5)
+  Nodes Expanded : 15,142
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.005s
+Move 26  BLACK AI  (2,3)->(3,2)
+  Nodes Expanded : 15,789
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.007s
+Move 28  BLACK AI  (3,4)->(5,2)
+  Nodes Expanded : 14,770
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.003s
+Move 30  BLACK AI  (5,2)->(7,4)
+  Nodes Expanded : 15,111
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.003s
+Move 32  BLACK AI  (2,5)->(4,3)
+  Nodes Expanded : 15,676
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.006s
+Move 34  BLACK AI  (1,6)->(2,5)
+  Nodes Expanded : 15,544
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.007s
+Move 36  BLACK AI  (5,4)->(7,2)
+  Nodes Expanded : 15,863
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.006s
+Move 38  BLACK AI  (3,6)->(5,4)
+  Nodes Expanded : 15,700
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.004s
+Move 40  BLACK AI  (8,5)->(6,7)
+  Nodes Expanded : 16,496
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 2.902s
+Move 42  BLACK AI  (2,5)->(3,4)
+  Nodes Expanded : 16,159
+  Nodes Pruned   : 0
+  Max Depth      : 9
+  Time Elapsed   : 3.006s
+Move 44  BLACK AI  (3,4)->(5,6)
+  Nodes Expanded : 1
+  Nodes Pruned   : 0
+  Max Depth      : 1
+  Time Elapsed   : 0.001s
+
+------------------------------------------------------------
+CUMULATIVE AI STATISTICS
+------------------------------------------------------------
+  Total AI Moves       : 22
+  Total Nodes Expanded : 310,941
+  Total Nodes Pruned   : 0
+  Max Depth Reached    : 9
+  Total Search Time    : 63.014s
+  Avg Time per Move    : 2.864s
+
+------------------------------------------------------------
+RESULT
+------------------------------------------------------------
+  Winner      : BLACK
+  Total Moves : 44
+
+============================================================
