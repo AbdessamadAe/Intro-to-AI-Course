@@ -69,32 +69,6 @@ This allows a single rule to apply to all rooms without hardcoding, achieving **
 
 The system follows the canonical **perceive-reason-act cycle** for knowledge-based agents:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    ENVIRONMENT                          │
-│  (Multi-room smart home: presence, temperature, etc.)   │
-└────────┬──────────────────────────────────┬────────────┘
-         │                                  │
-         │ Perceive                         │ Act
-         │ (sensor data)                    │ (device control)
-         ↓                                  ↑
-┌────────────────────────────────────────────────────────┐
-│                  KNOWLEDGE-BASED AGENT                 │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │         KNOWLEDGE BASE (KB)                      │  │
-│  │  - Facts: environmental observations             │  │
-│  │  - Rules: Horn clauses (14 rules)                │  │
-│  └──────────────────────────────────────────────────┘  │
-│                         ↕                              │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │      INFERENCE ENGINE                            │  │
-│  │  - Forward chaining algorithm                    │  │
-│  │  - Variable unification                          │  │
-│  │  - Conflict resolution (priority-based)          │  │
-│  └──────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────┘
-```
-
 ### 2.1 Component Responsibilities
 
 **Knowledge Base (`knowledge_base.py`):**
@@ -248,40 +222,7 @@ The system implements **14 Horn clause rules** covering three smart home domains
 
 ---
 
-## 6. IMPLEMENTATION HIGHLIGHTS
-
-### 6.1 No Procedural Shortcuts
-❌ **Avoided:** Hardcoded if-statement logic
-```python
-if presence and dark:
-    turn_on_light()  # Procedural approach
-```
-
-✅ **Implemented:** Declarative rule-based reasoning
-```python
-Rule("R1", 
-     conditions=[("presence", "?room"), ("dark", "?room")],
-     conclusion=("turn_on_light", "?room"))
-# Inference engine applies this generically
-```
-
-### 6.2 Explainability
-Every inference produces an `Explanation` object containing:
-- **Rule name**: Which rule fired
-- **Matched conditions**: Instantiated predicates that satisfied the rule
-- **Variable substitution**: `{?room: "kitchen"}`, etc.
-- **Conclusion**: Derived fact added to KB
-
-This enables full traceability from observations to actions.
-
-### 6.3 Pure Python Implementation
-- **No external AI libraries** (no experta, sklearn, etc.)
-- Demonstrates AI algorithms from first principles
-- All logic explicitly coded for educational clarity
-
----
-
-## 7. EXECUTION AND OUTPUT
+## 6. EXECUTION AND OUTPUT
 
 ### Running the Simulation
 ```bash
@@ -309,22 +250,4 @@ The simulation demonstrates:
 - ✓ Separation of facts vs. actions
 
 ---
-
-## 8. CONCLUSION
-
-This implementation demonstrates a **theoretically sound knowledge-based agent** using classical AI techniques. The system:
-- Represents knowledge as **Horn clauses** (formal logic)
-- Performs **data-driven inference** via forward chaining
-- Achieves **generalization** through variable unification
-- Ensures **correctness** (sound, complete, terminating)
-- Provides **explainability** (full inference traces)
-- Avoids **procedural shortcuts** (pure declarative reasoning)
-
-The architecture follows AIMA principles for knowledge-based agents and serves as a clear demonstration of symbolic AI reasoning in a practical domain.
-
----
-
-**Author:** CSC-3309 AI Course Project  
-**Date:** April 2026  
-**Implementation Language:** Python 3.7+
 
