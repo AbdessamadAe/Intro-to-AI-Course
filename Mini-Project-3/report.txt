@@ -1,0 +1,1316 @@
+
+======================================================================
+THEORETICAL CONCEPTS DEMONSTRATION
+======================================================================
+
+1. KNOWLEDGE-BASED AGENT ARCHITECTURE:
+   KB = Facts + Rules
+   Agent = Perceive → Update KB → Infer → Act
+
+2. LOGIC REPRESENTATION (Horn Clauses):
+   Rules are Horn Clauses: (A ∧ B ∧ ...) → C
+   Example: presence(?room) ∧ dark(?room) → turn_on_light(?room)
+   - Conditions: Conjunctions of predicates (can have variables)
+   - Conclusion: Single predicate to infer
+
+3. FORWARD CHAINING (Data-Driven Inference):
+   • Start from known facts (environmental observations)
+   • Repeatedly match and apply rules
+   • Add newly inferred facts to KB
+   • Stop at FIXPOINT (no new facts can be inferred)
+   - This is DATA-DRIVEN reasoning (facts trigger rules)
+
+4. VARIABLE UNIFICATION:
+   Pattern: ('presence', '?room')
+   Fact: ('presence', 'kitchen')
+   Substitution: {?room: 'kitchen'}
+   - Enables generic rules applicable to all rooms
+
+5. EXPLAINABILITY:
+   Every inference includes:
+   • Which rule fired
+   • Which conditions matched
+   • What was concluded
+   • Variable substitutions used
+
+======================================================================
+
+
+======================================================================
+SMART HOME KNOWLEDGE-BASED AGENT SIMULATION
+======================================================================
+
+This simulation demonstrates a knowledge-based agent using:
+  • Forward chaining inference (DATA-DRIVEN reasoning)
+  • Horn clause rules: (A ∧ B ∧ ...) → C
+  • Variable unification for generic rule application
+  • Explainable reasoning with full traceability
+
+[THEORETICAL FOUNDATION]
+  - Rules are represented as Horn clauses
+  - Inference is DATA-DRIVEN (forward chaining from facts)
+  - Process continues until FIXPOINT (no new facts inferrable)
+
+INITIALIZATION
+----------------------------------------------------------------------
+✓ Created smart home with 4 rooms: living_room, bedroom, kitchen, bathroom
+✓ Loaded 14 Horn clause rules
+✓ Initialized knowledge base and forward chaining engine
+
+RULE SET
+----------------------------------------------------------------------
+
+Rules sorted by priority (higher priority fires first):
+
+  R7_Window_Open_When_Air_Bad (Priority: 10)
+    IF ('air_bad', '?room')
+    THEN ('open_window', '?room')
+
+  R8_Fan_On_When_Air_Bad_And_Presence (Priority: 8)
+    IF ('air_bad', '?room') AND ('presence', '?room')
+    THEN ('turn_on_fan', '?room')
+
+  R9_AC_On_High_Temp_With_Presence (Priority: 7)
+    IF ('temperature_high', '?room') AND ('presence', '?room')
+    THEN ('turn_on_ac', '?room')
+
+  R10_Light_Off_Night_No_Presence (Priority: 6)
+    IF ('night', '?room') AND ('no_presence', '?room') AND ('light_on', '?room')
+    THEN ('turn_off_light', '?room')
+
+  R1_Light_On_When_Present_And_Dark (Priority: 5)
+    IF ('presence', '?room') AND ('dark', '?room')
+    THEN ('turn_on_light', '?room')
+
+  R2_Light_Off_When_No_Presence (Priority: 5)
+    IF ('no_presence', '?room') AND ('light_on', '?room')
+    THEN ('turn_off_light', '?room')
+
+  R3_Light_On_At_Night_With_Presence (Priority: 5)
+    IF ('night', '?room') AND ('presence', '?room')
+    THEN ('turn_on_light', '?room')
+
+  R4_AC_On_When_Temp_High (Priority: 5)
+    IF ('temperature_high', '?room')
+    THEN ('turn_on_ac', '?room')
+
+  R5_Heater_On_When_Temp_Low (Priority: 5)
+    IF ('temperature_low', '?room')
+    THEN ('turn_on_heater', '?room')
+
+  R13_Fan_On_High_Temp_Window_Closed (Priority: 5)
+    IF ('temperature_high', '?room') AND ('window_closed', '?room')
+    THEN ('turn_on_fan', '?room')
+
+  R12_Heater_Off_When_Not_Cold (Priority: 4)
+    IF ('temperature_moderate', '?room') AND ('heater_on', '?room')
+    THEN ('turn_off_heater', '?room')
+
+  R6_Climate_Off_When_Temp_Moderate (Priority: 3)
+    IF ('temperature_moderate', '?room')
+    THEN ('turn_off_climate', '?room')
+
+  R14_Turn_Off_AC_No_Presence (Priority: 3)
+    IF ('no_presence', '?room') AND ('ac_on', '?room')
+    THEN ('turn_off_ac', '?room')
+
+  R11_Window_Close_Moderate_Good_Air (Priority: 2)
+    IF ('temperature_moderate', '?room') AND ('air_good', '?room') AND ('window_open', '?room')
+    THEN ('close_window', '?room')
+
+======================================================================
+TIME STEP 1
+======================================================================
+
+============================================================
+ENVIRONMENT STATE - Time Step 0
+============================================================
+
+BATHROOM:
+  Presence: NO
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: day
+  Active Devices: none
+
+BEDROOM:
+  Presence: NO
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: day
+  Active Devices: none
+
+KITCHEN:
+  Presence: NO
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: day
+  Active Devices: none
+
+LIVING_ROOM:
+  Presence: NO
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: day
+  Active Devices: none
+============================================================
+
+KNOWLEDGE BASE BEFORE INFERENCE
+----------------------------------------------------------------------
+
+Total facts: 20 (all environmental state facts)
+
+  ENVIRONMENTAL FACTS (state observations):
+
+    bathroom:
+      ('air_good', 'bathroom')
+      ('day', 'bathroom')
+      ('no_presence', 'bathroom')
+      ('temperature_moderate', 'bathroom')
+      ('window_closed', 'bathroom')
+
+    bedroom:
+      ('air_good', 'bedroom')
+      ('day', 'bedroom')
+      ('no_presence', 'bedroom')
+      ('temperature_moderate', 'bedroom')
+      ('window_closed', 'bedroom')
+
+    kitchen:
+      ('air_good', 'kitchen')
+      ('day', 'kitchen')
+      ('no_presence', 'kitchen')
+      ('temperature_moderate', 'kitchen')
+      ('window_closed', 'kitchen')
+
+    living_room:
+      ('air_good', 'living_room')
+      ('day', 'living_room')
+      ('no_presence', 'living_room')
+      ('temperature_moderate', 'living_room')
+      ('window_closed', 'living_room')
+
+FORWARD CHAINING INFERENCE (Data-Driven Reasoning)
+----------------------------------------------------------------------
+
+Applying Horn clause rules via forward chaining...
+Process: Match conditions → Fire rules → Add conclusions → Repeat until fixpoint
+
+✓ FIXPOINT REACHED after 2 iteration(s): No more rules applicable
+
+✓ Inference Statistics:
+  Facts before inference: 20
+  Facts after inference: 24
+  New facts inferred: 4
+  Rules fired: 4
+
+RULES FIRED (with Explanations)
+----------------------------------------------------------------------
+
+  [1] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'bathroom')
+  Substitution: ?room=bathroom
+  Conclusion: ('turn_off_climate', 'bathroom')
+
+  [2] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'bedroom')
+  Substitution: ?room=bedroom
+  Conclusion: ('turn_off_climate', 'bedroom')
+
+  [3] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'living_room')
+  Substitution: ?room=living_room
+  Conclusion: ('turn_off_climate', 'living_room')
+
+  [4] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'kitchen')
+  Substitution: ?room=kitchen
+  Conclusion: ('turn_off_climate', 'kitchen')
+
+KNOWLEDGE BASE AFTER INFERENCE
+----------------------------------------------------------------------
+
+Total facts: 24 (environmental facts + derived actions)
+
+  ENVIRONMENTAL FACTS (state observations):
+
+    bathroom:
+      ('air_good', 'bathroom')
+      ('day', 'bathroom')
+      ('no_presence', 'bathroom')
+      ('temperature_moderate', 'bathroom')
+      ('window_closed', 'bathroom')
+
+    bedroom:
+      ('air_good', 'bedroom')
+      ('day', 'bedroom')
+      ('no_presence', 'bedroom')
+      ('temperature_moderate', 'bedroom')
+      ('window_closed', 'bedroom')
+
+    kitchen:
+      ('air_good', 'kitchen')
+      ('day', 'kitchen')
+      ('no_presence', 'kitchen')
+      ('temperature_moderate', 'kitchen')
+      ('window_closed', 'kitchen')
+
+    living_room:
+      ('air_good', 'living_room')
+      ('day', 'living_room')
+      ('no_presence', 'living_room')
+      ('temperature_moderate', 'living_room')
+      ('window_closed', 'living_room')
+
+  DERIVED ACTION FACTS (inferred by rules):
+
+    bathroom:
+      ('turn_off_climate', 'bathroom')
+
+    bedroom:
+      ('turn_off_climate', 'bedroom')
+
+    kitchen:
+      ('turn_off_climate', 'kitchen')
+
+    living_room:
+      ('turn_off_climate', 'living_room')
+
+ACTIONS TAKEN
+----------------------------------------------------------------------
+
+  [No actions taken - no device state changes]
+
+ENVIRONMENT UPDATE
+----------------------------------------------------------------------
+
+Simulating environmental changes...
+✓ Environment updated (random changes applied)
+
+······································································
+Press Ctrl+C to stop simulation early...
+······································································
+
+======================================================================
+TIME STEP 2
+======================================================================
+
+============================================================
+ENVIRONMENT STATE - Time Step 1
+============================================================
+
+BATHROOM:
+  Presence: NO
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: day
+  Active Devices: none
+
+BEDROOM:
+  Presence: NO
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: day
+  Active Devices: none
+
+KITCHEN:
+  Presence: NO
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: day
+  Active Devices: none
+
+LIVING_ROOM:
+  Presence: NO
+  Light Level: dark
+  Temperature: moderate
+  Air Quality: good
+  Time: day
+  Active Devices: none
+============================================================
+
+KNOWLEDGE BASE BEFORE INFERENCE
+----------------------------------------------------------------------
+
+Total facts: 21 (all environmental state facts)
+
+  ENVIRONMENTAL FACTS (state observations):
+
+    bathroom:
+      ('air_good', 'bathroom')
+      ('day', 'bathroom')
+      ('no_presence', 'bathroom')
+      ('temperature_moderate', 'bathroom')
+      ('window_closed', 'bathroom')
+
+    bedroom:
+      ('air_good', 'bedroom')
+      ('day', 'bedroom')
+      ('no_presence', 'bedroom')
+      ('temperature_moderate', 'bedroom')
+      ('window_closed', 'bedroom')
+
+    kitchen:
+      ('air_good', 'kitchen')
+      ('day', 'kitchen')
+      ('no_presence', 'kitchen')
+      ('temperature_moderate', 'kitchen')
+      ('window_closed', 'kitchen')
+
+    living_room:
+      ('air_good', 'living_room')
+      ('dark', 'living_room')
+      ('day', 'living_room')
+      ('no_presence', 'living_room')
+      ('temperature_moderate', 'living_room')
+      ('window_closed', 'living_room')
+
+FORWARD CHAINING INFERENCE (Data-Driven Reasoning)
+----------------------------------------------------------------------
+
+Applying Horn clause rules via forward chaining...
+Process: Match conditions → Fire rules → Add conclusions → Repeat until fixpoint
+
+✓ FIXPOINT REACHED after 2 iteration(s): No more rules applicable
+
+✓ Inference Statistics:
+  Facts before inference: 21
+  Facts after inference: 25
+  New facts inferred: 4
+  Rules fired: 4
+
+RULES FIRED (with Explanations)
+----------------------------------------------------------------------
+
+  [1] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'bathroom')
+  Substitution: ?room=bathroom
+  Conclusion: ('turn_off_climate', 'bathroom')
+
+  [2] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'bedroom')
+  Substitution: ?room=bedroom
+  Conclusion: ('turn_off_climate', 'bedroom')
+
+  [3] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'living_room')
+  Substitution: ?room=living_room
+  Conclusion: ('turn_off_climate', 'living_room')
+
+  [4] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'kitchen')
+  Substitution: ?room=kitchen
+  Conclusion: ('turn_off_climate', 'kitchen')
+
+KNOWLEDGE BASE AFTER INFERENCE
+----------------------------------------------------------------------
+
+Total facts: 25 (environmental facts + derived actions)
+
+  ENVIRONMENTAL FACTS (state observations):
+
+    bathroom:
+      ('air_good', 'bathroom')
+      ('day', 'bathroom')
+      ('no_presence', 'bathroom')
+      ('temperature_moderate', 'bathroom')
+      ('window_closed', 'bathroom')
+
+    bedroom:
+      ('air_good', 'bedroom')
+      ('day', 'bedroom')
+      ('no_presence', 'bedroom')
+      ('temperature_moderate', 'bedroom')
+      ('window_closed', 'bedroom')
+
+    kitchen:
+      ('air_good', 'kitchen')
+      ('day', 'kitchen')
+      ('no_presence', 'kitchen')
+      ('temperature_moderate', 'kitchen')
+      ('window_closed', 'kitchen')
+
+    living_room:
+      ('air_good', 'living_room')
+      ('dark', 'living_room')
+      ('day', 'living_room')
+      ('no_presence', 'living_room')
+      ('temperature_moderate', 'living_room')
+      ('window_closed', 'living_room')
+
+  DERIVED ACTION FACTS (inferred by rules):
+
+    bathroom:
+      ('turn_off_climate', 'bathroom')
+
+    bedroom:
+      ('turn_off_climate', 'bedroom')
+
+    kitchen:
+      ('turn_off_climate', 'kitchen')
+
+    living_room:
+      ('turn_off_climate', 'living_room')
+
+ACTIONS TAKEN
+----------------------------------------------------------------------
+
+  [No actions taken - no device state changes]
+
+ENVIRONMENT UPDATE
+----------------------------------------------------------------------
+
+Simulating environmental changes...
+✓ Environment updated (random changes applied)
+
+······································································
+Press Ctrl+C to stop simulation early...
+······································································
+
+======================================================================
+TIME STEP 3
+======================================================================
+
+============================================================
+ENVIRONMENT STATE - Time Step 2
+============================================================
+
+BATHROOM:
+  Presence: NO
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: night
+  Active Devices: none
+
+BEDROOM:
+  Presence: YES
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: night
+  Active Devices: none
+
+KITCHEN:
+  Presence: YES
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: night
+  Active Devices: none
+
+LIVING_ROOM:
+  Presence: NO
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: night
+  Active Devices: none
+============================================================
+
+KNOWLEDGE BASE BEFORE INFERENCE
+----------------------------------------------------------------------
+
+Total facts: 20 (all environmental state facts)
+
+  ENVIRONMENTAL FACTS (state observations):
+
+    bathroom:
+      ('air_good', 'bathroom')
+      ('night', 'bathroom')
+      ('no_presence', 'bathroom')
+      ('temperature_moderate', 'bathroom')
+      ('window_closed', 'bathroom')
+
+    bedroom:
+      ('air_good', 'bedroom')
+      ('night', 'bedroom')
+      ('presence', 'bedroom')
+      ('temperature_moderate', 'bedroom')
+      ('window_closed', 'bedroom')
+
+    kitchen:
+      ('air_good', 'kitchen')
+      ('night', 'kitchen')
+      ('presence', 'kitchen')
+      ('temperature_moderate', 'kitchen')
+      ('window_closed', 'kitchen')
+
+    living_room:
+      ('air_good', 'living_room')
+      ('night', 'living_room')
+      ('no_presence', 'living_room')
+      ('temperature_moderate', 'living_room')
+      ('window_closed', 'living_room')
+
+FORWARD CHAINING INFERENCE (Data-Driven Reasoning)
+----------------------------------------------------------------------
+
+Applying Horn clause rules via forward chaining...
+Process: Match conditions → Fire rules → Add conclusions → Repeat until fixpoint
+
+✓ FIXPOINT REACHED after 2 iteration(s): No more rules applicable
+
+✓ Inference Statistics:
+  Facts before inference: 20
+  Facts after inference: 26
+  New facts inferred: 6
+  Rules fired: 6
+
+RULES FIRED (with Explanations)
+----------------------------------------------------------------------
+
+  [1] Rule: R3_Light_On_At_Night_With_Presence
+  Conditions matched: ('night', 'kitchen'), ('presence', 'kitchen')
+  Substitution: ?room=kitchen
+  Conclusion: ('turn_on_light', 'kitchen')
+
+  [2] Rule: R3_Light_On_At_Night_With_Presence
+  Conditions matched: ('night', 'bedroom'), ('presence', 'bedroom')
+  Substitution: ?room=bedroom
+  Conclusion: ('turn_on_light', 'bedroom')
+
+  [3] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'bathroom')
+  Substitution: ?room=bathroom
+  Conclusion: ('turn_off_climate', 'bathroom')
+
+  [4] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'bedroom')
+  Substitution: ?room=bedroom
+  Conclusion: ('turn_off_climate', 'bedroom')
+
+  [5] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'living_room')
+  Substitution: ?room=living_room
+  Conclusion: ('turn_off_climate', 'living_room')
+
+  [6] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'kitchen')
+  Substitution: ?room=kitchen
+  Conclusion: ('turn_off_climate', 'kitchen')
+
+KNOWLEDGE BASE AFTER INFERENCE
+----------------------------------------------------------------------
+
+Total facts: 26 (environmental facts + derived actions)
+
+  ENVIRONMENTAL FACTS (state observations):
+
+    bathroom:
+      ('air_good', 'bathroom')
+      ('night', 'bathroom')
+      ('no_presence', 'bathroom')
+      ('temperature_moderate', 'bathroom')
+      ('window_closed', 'bathroom')
+
+    bedroom:
+      ('air_good', 'bedroom')
+      ('night', 'bedroom')
+      ('presence', 'bedroom')
+      ('temperature_moderate', 'bedroom')
+      ('window_closed', 'bedroom')
+
+    kitchen:
+      ('air_good', 'kitchen')
+      ('night', 'kitchen')
+      ('presence', 'kitchen')
+      ('temperature_moderate', 'kitchen')
+      ('window_closed', 'kitchen')
+
+    living_room:
+      ('air_good', 'living_room')
+      ('night', 'living_room')
+      ('no_presence', 'living_room')
+      ('temperature_moderate', 'living_room')
+      ('window_closed', 'living_room')
+
+  DERIVED ACTION FACTS (inferred by rules):
+
+    bathroom:
+      ('turn_off_climate', 'bathroom')
+
+    bedroom:
+      ('turn_off_climate', 'bedroom')
+      ('turn_on_light', 'bedroom')
+
+    kitchen:
+      ('turn_off_climate', 'kitchen')
+      ('turn_on_light', 'kitchen')
+
+    living_room:
+      ('turn_off_climate', 'living_room')
+
+ACTIONS TAKEN
+----------------------------------------------------------------------
+
+Device state changes:
+  • Turned ON light in bedroom
+  • Turned ON light in kitchen
+
+ENVIRONMENT UPDATE
+----------------------------------------------------------------------
+
+Simulating environmental changes...
+✓ Environment updated (random changes applied)
+
+······································································
+Press Ctrl+C to stop simulation early...
+······································································
+
+======================================================================
+TIME STEP 4
+======================================================================
+
+============================================================
+ENVIRONMENT STATE - Time Step 3
+============================================================
+
+BATHROOM:
+  Presence: YES
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: night
+  Active Devices: none
+
+BEDROOM:
+  Presence: YES
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: night
+  Active Devices: light
+
+KITCHEN:
+  Presence: NO
+  Light Level: dark
+  Temperature: moderate
+  Air Quality: good
+  Time: night
+  Active Devices: light
+
+LIVING_ROOM:
+  Presence: YES
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: night
+  Active Devices: none
+============================================================
+
+KNOWLEDGE BASE BEFORE INFERENCE
+----------------------------------------------------------------------
+
+Total facts: 23 (all environmental state facts)
+
+  ENVIRONMENTAL FACTS (state observations):
+
+    bathroom:
+      ('air_good', 'bathroom')
+      ('night', 'bathroom')
+      ('presence', 'bathroom')
+      ('temperature_moderate', 'bathroom')
+      ('window_closed', 'bathroom')
+
+    bedroom:
+      ('air_good', 'bedroom')
+      ('light_on', 'bedroom')
+      ('night', 'bedroom')
+      ('presence', 'bedroom')
+      ('temperature_moderate', 'bedroom')
+      ('window_closed', 'bedroom')
+
+    kitchen:
+      ('air_good', 'kitchen')
+      ('dark', 'kitchen')
+      ('light_on', 'kitchen')
+      ('night', 'kitchen')
+      ('no_presence', 'kitchen')
+      ('temperature_moderate', 'kitchen')
+      ('window_closed', 'kitchen')
+
+    living_room:
+      ('air_good', 'living_room')
+      ('night', 'living_room')
+      ('presence', 'living_room')
+      ('temperature_moderate', 'living_room')
+      ('window_closed', 'living_room')
+
+FORWARD CHAINING INFERENCE (Data-Driven Reasoning)
+----------------------------------------------------------------------
+
+Applying Horn clause rules via forward chaining...
+Process: Match conditions → Fire rules → Add conclusions → Repeat until fixpoint
+
+✓ FIXPOINT REACHED after 2 iteration(s): No more rules applicable
+
+✓ Inference Statistics:
+  Facts before inference: 23
+  Facts after inference: 31
+  New facts inferred: 8
+  Rules fired: 8
+
+RULES FIRED (with Explanations)
+----------------------------------------------------------------------
+
+  [1] Rule: R10_Light_Off_Night_No_Presence
+  Conditions matched: ('night', 'kitchen'), ('no_presence', 'kitchen'), ('light_on', 'kitchen')
+  Substitution: ?room=kitchen
+  Conclusion: ('turn_off_light', 'kitchen')
+
+  [2] Rule: R3_Light_On_At_Night_With_Presence
+  Conditions matched: ('night', 'bathroom'), ('presence', 'bathroom')
+  Substitution: ?room=bathroom
+  Conclusion: ('turn_on_light', 'bathroom')
+
+  [3] Rule: R3_Light_On_At_Night_With_Presence
+  Conditions matched: ('night', 'bedroom'), ('presence', 'bedroom')
+  Substitution: ?room=bedroom
+  Conclusion: ('turn_on_light', 'bedroom')
+
+  [4] Rule: R3_Light_On_At_Night_With_Presence
+  Conditions matched: ('night', 'living_room'), ('presence', 'living_room')
+  Substitution: ?room=living_room
+  Conclusion: ('turn_on_light', 'living_room')
+
+  [5] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'bathroom')
+  Substitution: ?room=bathroom
+  Conclusion: ('turn_off_climate', 'bathroom')
+
+  [6] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'bedroom')
+  Substitution: ?room=bedroom
+  Conclusion: ('turn_off_climate', 'bedroom')
+
+  [7] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'living_room')
+  Substitution: ?room=living_room
+  Conclusion: ('turn_off_climate', 'living_room')
+
+  [8] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'kitchen')
+  Substitution: ?room=kitchen
+  Conclusion: ('turn_off_climate', 'kitchen')
+
+KNOWLEDGE BASE AFTER INFERENCE
+----------------------------------------------------------------------
+
+Total facts: 31 (environmental facts + derived actions)
+
+  ENVIRONMENTAL FACTS (state observations):
+
+    bathroom:
+      ('air_good', 'bathroom')
+      ('night', 'bathroom')
+      ('presence', 'bathroom')
+      ('temperature_moderate', 'bathroom')
+      ('window_closed', 'bathroom')
+
+    bedroom:
+      ('air_good', 'bedroom')
+      ('light_on', 'bedroom')
+      ('night', 'bedroom')
+      ('presence', 'bedroom')
+      ('temperature_moderate', 'bedroom')
+      ('window_closed', 'bedroom')
+
+    kitchen:
+      ('air_good', 'kitchen')
+      ('dark', 'kitchen')
+      ('light_on', 'kitchen')
+      ('night', 'kitchen')
+      ('no_presence', 'kitchen')
+      ('temperature_moderate', 'kitchen')
+      ('window_closed', 'kitchen')
+
+    living_room:
+      ('air_good', 'living_room')
+      ('night', 'living_room')
+      ('presence', 'living_room')
+      ('temperature_moderate', 'living_room')
+      ('window_closed', 'living_room')
+
+  DERIVED ACTION FACTS (inferred by rules):
+
+    bathroom:
+      ('turn_off_climate', 'bathroom')
+      ('turn_on_light', 'bathroom')
+
+    bedroom:
+      ('turn_off_climate', 'bedroom')
+      ('turn_on_light', 'bedroom')
+
+    kitchen:
+      ('turn_off_climate', 'kitchen')
+      ('turn_off_light', 'kitchen')
+
+    living_room:
+      ('turn_off_climate', 'living_room')
+      ('turn_on_light', 'living_room')
+
+ACTIONS TAKEN
+----------------------------------------------------------------------
+
+Device state changes:
+  • Turned ON light in bathroom
+  • Turned ON light in living_room
+  • Turned OFF light in kitchen
+
+ENVIRONMENT UPDATE
+----------------------------------------------------------------------
+
+Simulating environmental changes...
+✓ Environment updated (random changes applied)
+
+······································································
+Press Ctrl+C to stop simulation early...
+······································································
+
+======================================================================
+TIME STEP 5
+======================================================================
+
+============================================================
+ENVIRONMENT STATE - Time Step 4
+============================================================
+
+BATHROOM:
+  Presence: YES
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: day
+  Active Devices: light
+
+BEDROOM:
+  Presence: YES
+  Light Level: bright
+  Temperature: moderate
+  Air Quality: good
+  Time: day
+  Active Devices: light
+
+KITCHEN:
+  Presence: YES
+  Light Level: dark
+  Temperature: moderate
+  Air Quality: bad
+  Time: day
+  Active Devices: none
+
+LIVING_ROOM:
+  Presence: YES
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: day
+  Active Devices: light
+============================================================
+
+KNOWLEDGE BASE BEFORE INFERENCE
+----------------------------------------------------------------------
+
+Total facts: 25 (all environmental state facts)
+
+  ENVIRONMENTAL FACTS (state observations):
+
+    bathroom:
+      ('air_good', 'bathroom')
+      ('day', 'bathroom')
+      ('light_on', 'bathroom')
+      ('presence', 'bathroom')
+      ('temperature_moderate', 'bathroom')
+      ('window_closed', 'bathroom')
+
+    bedroom:
+      ('air_good', 'bedroom')
+      ('bright', 'bedroom')
+      ('day', 'bedroom')
+      ('light_on', 'bedroom')
+      ('presence', 'bedroom')
+      ('temperature_moderate', 'bedroom')
+      ('window_closed', 'bedroom')
+
+    kitchen:
+      ('air_bad', 'kitchen')
+      ('dark', 'kitchen')
+      ('day', 'kitchen')
+      ('presence', 'kitchen')
+      ('temperature_moderate', 'kitchen')
+      ('window_closed', 'kitchen')
+
+    living_room:
+      ('air_good', 'living_room')
+      ('day', 'living_room')
+      ('light_on', 'living_room')
+      ('presence', 'living_room')
+      ('temperature_moderate', 'living_room')
+      ('window_closed', 'living_room')
+
+FORWARD CHAINING INFERENCE (Data-Driven Reasoning)
+----------------------------------------------------------------------
+
+Applying Horn clause rules via forward chaining...
+Process: Match conditions → Fire rules → Add conclusions → Repeat until fixpoint
+
+✓ FIXPOINT REACHED after 2 iteration(s): No more rules applicable
+
+✓ Inference Statistics:
+  Facts before inference: 25
+  Facts after inference: 32
+  New facts inferred: 7
+  Rules fired: 7
+
+RULES FIRED (with Explanations)
+----------------------------------------------------------------------
+
+  [1] Rule: R7_Window_Open_When_Air_Bad
+  Conditions matched: ('air_bad', 'kitchen')
+  Substitution: ?room=kitchen
+  Conclusion: ('open_window', 'kitchen')
+
+  [2] Rule: R8_Fan_On_When_Air_Bad_And_Presence
+  Conditions matched: ('air_bad', 'kitchen'), ('presence', 'kitchen')
+  Substitution: ?room=kitchen
+  Conclusion: ('turn_on_fan', 'kitchen')
+
+  [3] Rule: R1_Light_On_When_Present_And_Dark
+  Conditions matched: ('presence', 'kitchen'), ('dark', 'kitchen')
+  Substitution: ?room=kitchen
+  Conclusion: ('turn_on_light', 'kitchen')
+
+  [4] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'bathroom')
+  Substitution: ?room=bathroom
+  Conclusion: ('turn_off_climate', 'bathroom')
+
+  [5] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'bedroom')
+  Substitution: ?room=bedroom
+  Conclusion: ('turn_off_climate', 'bedroom')
+
+  [6] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'living_room')
+  Substitution: ?room=living_room
+  Conclusion: ('turn_off_climate', 'living_room')
+
+  [7] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'kitchen')
+  Substitution: ?room=kitchen
+  Conclusion: ('turn_off_climate', 'kitchen')
+
+KNOWLEDGE BASE AFTER INFERENCE
+----------------------------------------------------------------------
+
+Total facts: 32 (environmental facts + derived actions)
+
+  ENVIRONMENTAL FACTS (state observations):
+
+    bathroom:
+      ('air_good', 'bathroom')
+      ('day', 'bathroom')
+      ('light_on', 'bathroom')
+      ('presence', 'bathroom')
+      ('temperature_moderate', 'bathroom')
+      ('window_closed', 'bathroom')
+
+    bedroom:
+      ('air_good', 'bedroom')
+      ('bright', 'bedroom')
+      ('day', 'bedroom')
+      ('light_on', 'bedroom')
+      ('presence', 'bedroom')
+      ('temperature_moderate', 'bedroom')
+      ('window_closed', 'bedroom')
+
+    kitchen:
+      ('air_bad', 'kitchen')
+      ('dark', 'kitchen')
+      ('day', 'kitchen')
+      ('presence', 'kitchen')
+      ('temperature_moderate', 'kitchen')
+      ('window_closed', 'kitchen')
+
+    living_room:
+      ('air_good', 'living_room')
+      ('day', 'living_room')
+      ('light_on', 'living_room')
+      ('presence', 'living_room')
+      ('temperature_moderate', 'living_room')
+      ('window_closed', 'living_room')
+
+  DERIVED ACTION FACTS (inferred by rules):
+
+    bathroom:
+      ('turn_off_climate', 'bathroom')
+
+    bedroom:
+      ('turn_off_climate', 'bedroom')
+
+    kitchen:
+      ('open_window', 'kitchen')
+      ('turn_off_climate', 'kitchen')
+      ('turn_on_fan', 'kitchen')
+      ('turn_on_light', 'kitchen')
+
+    living_room:
+      ('turn_off_climate', 'living_room')
+
+ACTIONS TAKEN
+----------------------------------------------------------------------
+
+Device state changes:
+  • Turned ON fan in kitchen
+  • Opened window in kitchen
+  • Turned ON light in kitchen
+
+ENVIRONMENT UPDATE
+----------------------------------------------------------------------
+
+Simulating environmental changes...
+✓ Environment updated (random changes applied)
+
+······································································
+Press Ctrl+C to stop simulation early...
+······································································
+
+======================================================================
+TIME STEP 6
+======================================================================
+
+============================================================
+ENVIRONMENT STATE - Time Step 5
+============================================================
+
+BATHROOM:
+  Presence: NO
+  Light Level: moderate
+  Temperature: moderate
+  Air Quality: good
+  Time: day
+  Active Devices: light
+
+BEDROOM:
+  Presence: YES
+  Light Level: bright
+  Temperature: moderate
+  Air Quality: good
+  Time: day
+  Active Devices: light
+
+KITCHEN:
+  Presence: YES
+  Light Level: bright
+  Temperature: moderate
+  Air Quality: bad
+  Time: day
+  Active Devices: light, fan, window
+
+LIVING_ROOM:
+  Presence: NO
+  Light Level: moderate
+  Temperature: high
+  Air Quality: good
+  Time: day
+  Active Devices: light
+============================================================
+
+KNOWLEDGE BASE BEFORE INFERENCE
+----------------------------------------------------------------------
+
+Total facts: 27 (all environmental state facts)
+
+  ENVIRONMENTAL FACTS (state observations):
+
+    bathroom:
+      ('air_good', 'bathroom')
+      ('day', 'bathroom')
+      ('light_on', 'bathroom')
+      ('no_presence', 'bathroom')
+      ('temperature_moderate', 'bathroom')
+      ('window_closed', 'bathroom')
+
+    bedroom:
+      ('air_good', 'bedroom')
+      ('bright', 'bedroom')
+      ('day', 'bedroom')
+      ('light_on', 'bedroom')
+      ('presence', 'bedroom')
+      ('temperature_moderate', 'bedroom')
+      ('window_closed', 'bedroom')
+
+    kitchen:
+      ('air_bad', 'kitchen')
+      ('bright', 'kitchen')
+      ('day', 'kitchen')
+      ('fan_on', 'kitchen')
+      ('light_on', 'kitchen')
+      ('presence', 'kitchen')
+      ('temperature_moderate', 'kitchen')
+      ('window_open', 'kitchen')
+
+    living_room:
+      ('air_good', 'living_room')
+      ('day', 'living_room')
+      ('light_on', 'living_room')
+      ('no_presence', 'living_room')
+      ('temperature_high', 'living_room')
+      ('window_closed', 'living_room')
+
+FORWARD CHAINING INFERENCE (Data-Driven Reasoning)
+----------------------------------------------------------------------
+
+Applying Horn clause rules via forward chaining...
+Process: Match conditions → Fire rules → Add conclusions → Repeat until fixpoint
+
+✓ FIXPOINT REACHED after 2 iteration(s): No more rules applicable
+
+✓ Inference Statistics:
+  Facts before inference: 27
+  Facts after inference: 36
+  New facts inferred: 9
+  Rules fired: 9
+
+RULES FIRED (with Explanations)
+----------------------------------------------------------------------
+
+  [1] Rule: R7_Window_Open_When_Air_Bad
+  Conditions matched: ('air_bad', 'kitchen')
+  Substitution: ?room=kitchen
+  Conclusion: ('open_window', 'kitchen')
+
+  [2] Rule: R8_Fan_On_When_Air_Bad_And_Presence
+  Conditions matched: ('air_bad', 'kitchen'), ('presence', 'kitchen')
+  Substitution: ?room=kitchen
+  Conclusion: ('turn_on_fan', 'kitchen')
+
+  [3] Rule: R2_Light_Off_When_No_Presence
+  Conditions matched: ('no_presence', 'bathroom'), ('light_on', 'bathroom')
+  Substitution: ?room=bathroom
+  Conclusion: ('turn_off_light', 'bathroom')
+
+  [4] Rule: R2_Light_Off_When_No_Presence
+  Conditions matched: ('no_presence', 'living_room'), ('light_on', 'living_room')
+  Substitution: ?room=living_room
+  Conclusion: ('turn_off_light', 'living_room')
+
+  [5] Rule: R4_AC_On_When_Temp_High
+  Conditions matched: ('temperature_high', 'living_room')
+  Substitution: ?room=living_room
+  Conclusion: ('turn_on_ac', 'living_room')
+
+  [6] Rule: R13_Fan_On_High_Temp_Window_Closed
+  Conditions matched: ('temperature_high', 'living_room'), ('window_closed', 'living_room')
+  Substitution: ?room=living_room
+  Conclusion: ('turn_on_fan', 'living_room')
+
+  [7] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'bathroom')
+  Substitution: ?room=bathroom
+  Conclusion: ('turn_off_climate', 'bathroom')
+
+  [8] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'bedroom')
+  Substitution: ?room=bedroom
+  Conclusion: ('turn_off_climate', 'bedroom')
+
+  [9] Rule: R6_Climate_Off_When_Temp_Moderate
+  Conditions matched: ('temperature_moderate', 'kitchen')
+  Substitution: ?room=kitchen
+  Conclusion: ('turn_off_climate', 'kitchen')
+
+KNOWLEDGE BASE AFTER INFERENCE
+----------------------------------------------------------------------
+
+Total facts: 36 (environmental facts + derived actions)
+
+  ENVIRONMENTAL FACTS (state observations):
+
+    bathroom:
+      ('air_good', 'bathroom')
+      ('day', 'bathroom')
+      ('light_on', 'bathroom')
+      ('no_presence', 'bathroom')
+      ('temperature_moderate', 'bathroom')
+      ('window_closed', 'bathroom')
+
+    bedroom:
+      ('air_good', 'bedroom')
+      ('bright', 'bedroom')
+      ('day', 'bedroom')
+      ('light_on', 'bedroom')
+      ('presence', 'bedroom')
+      ('temperature_moderate', 'bedroom')
+      ('window_closed', 'bedroom')
+
+    kitchen:
+      ('air_bad', 'kitchen')
+      ('bright', 'kitchen')
+      ('day', 'kitchen')
+      ('fan_on', 'kitchen')
+      ('light_on', 'kitchen')
+      ('presence', 'kitchen')
+      ('temperature_moderate', 'kitchen')
+      ('window_open', 'kitchen')
+
+    living_room:
+      ('air_good', 'living_room')
+      ('day', 'living_room')
+      ('light_on', 'living_room')
+      ('no_presence', 'living_room')
+      ('temperature_high', 'living_room')
+      ('window_closed', 'living_room')
+
+  DERIVED ACTION FACTS (inferred by rules):
+
+    bathroom:
+      ('turn_off_climate', 'bathroom')
+      ('turn_off_light', 'bathroom')
+
+    bedroom:
+      ('turn_off_climate', 'bedroom')
+
+    kitchen:
+      ('open_window', 'kitchen')
+      ('turn_off_climate', 'kitchen')
+      ('turn_on_fan', 'kitchen')
+
+    living_room:
+      ('turn_off_light', 'living_room')
+      ('turn_on_ac', 'living_room')
+      ('turn_on_fan', 'living_room')
+
+ACTIONS TAKEN
+----------------------------------------------------------------------
+
+Device state changes:
+  • Turned ON fan in living_room
+  • Turned ON AC in living_room
+  • Turned OFF light in bathroom
+  • Turned OFF light in living_room
+
+======================================================================
+SIMULATION COMPLETE
+======================================================================
+
+✓ Completed 6 time steps
+✓ Knowledge-based reasoning with forward chaining
+✓ All inferences traced and explained
+
+The agent successfully demonstrated:
+  • Data-driven reasoning (forward chaining)
+  • Generic rule application (variables)
+  • Fixpoint convergence
+  • Explainable AI (full trace of inferences)
+
+======================================================================
+
