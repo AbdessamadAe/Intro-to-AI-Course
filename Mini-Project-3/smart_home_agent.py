@@ -260,8 +260,8 @@ def demonstrate_theoretical_concepts():
 
 
 if __name__ == '__main__':
-    # Redirect output to both console and report.txt
-    tee = TeeOutput('report.txt')
+    # Redirect output to both console and output.txt
+    tee = TeeOutput('output.txt')
     sys.stdout = tee
     
     try:
@@ -279,4 +279,4 @@ if __name__ == '__main__':
         # Restore stdout and close file
         sys.stdout = tee.terminal
         tee.close()
-        print("✓ Simulation output saved to report.txt")
+        print("✓ Simulation output saved to output.txt")
